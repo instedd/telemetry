@@ -33,10 +33,15 @@ describe InsteddTelemetry do
     end
 
     it "merges metadata if element was already present in set" do
-      InsteddTelemetry.set_add(:foo, :bar, {"attr_1" => 123, "attr_2" => 456})
-      InsteddTelemetry.set_add(:foo, :bar, {"attr_2" => 111, "attr_3" => 789})
+      InsteddTelemetry.set_add(:foo, :bar)
+      
+      InsteddTelemetry.set_add(:foo, :baz, {"attr_1" => 123, "attr_2" => 456})
+      InsteddTelemetry.set_add(:foo, :baz, {"attr_2" => 111, "attr_3" => 789})
 
-      occurrence = SetOccurrence.first!
+      occurrence = SetOccurrence.where(set_key: :foo, element_key: :bar).first
+      expect(occurrence.metadata).to be_empty
+
+      occurrence = SetOccurrence.where(set_key: :foo, element_key: :baz).first
       expect(occurrence.metadata).to eq({"attr_1" => 123, "attr_2" => 111, "attr_3" => 789})
     end
 
