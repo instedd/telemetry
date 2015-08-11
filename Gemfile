@@ -25,5 +25,5 @@ gem 'rails', rails_version_spec
 gem 'test-unit'
 
 group :development, :test do
-  gem 'pry-byebug'
+  gem 'pry-byebug' unless ENV["TRAVIS"]
 end
