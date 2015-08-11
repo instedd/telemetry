@@ -11,12 +11,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150810181318) do
+ActiveRecord::Schema.define(version: 20150811154445) do
 
-  create_table "set_occurrences", force: :cascade do |t|
-    t.string "set_key"
-    t.string "element_key"
-    t.text   "metadata"
+  create_table "telemetry_set_occurrences", force: :cascade do |t|
+    t.string "bucket"
+    t.text   "key_attributes"
+    t.string "element"
   end
 
 end

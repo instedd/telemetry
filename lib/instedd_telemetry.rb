@@ -2,11 +2,12 @@ require "instedd_telemetry/engine"
 
 module InsteddTelemetry
 
-  def self.set_add(set_key, element_key, metadata = {})
-    occurrence = SetOccurrence.find_or_initialize_by(set_key: set_key, element_key: element_key)
-    occurrence.metadata ||= {}
-    occurrence.metadata.merge! metadata.with_indifferent_access
-    occurrence.save
+  def self.set_add(bucket, key_attributes, element)
+    SetOccurrence.find_or_create_occurrence({
+      bucket: bucket,
+      key_attributes: key_attributes,
+      element: element
+    })
   end
 
 end
