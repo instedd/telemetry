@@ -13,3 +13,13 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+rails_version = ENV["RAILS_VERSION"] || "default"
+rails_version_spec = case rails_version
+when "default"
+  nil
+else
+  "~> #{rails_version}"
+end
+
+gem 'rails', rails_version_spec
+gem 'test-unit'
