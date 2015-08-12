@@ -3,23 +3,27 @@ require "instedd_telemetry/engine"
 module InsteddTelemetry
 
   def self.set_add(bucket, key_attributes, element)
-    in_transaction do
-      SetOccurrence.find_or_create_by({
-        bucket: bucket,
-        key_attributes: serialize_key_attributes(key_attributes),
-        element: element
-      })
+    swallowing_errors do
+      in_transaction do
+        SetOccurrence.find_or_create_by({
+          bucket: bucket,
+          key_attributes: serialize_key_attributes(key_attributes),
+          element: element
+        })
+      end
     end
   end
 
   def self.counter_add(bucket, key_attributes, amount = 1)
-    in_transaction do
-      counter = Counter.find_or_initialize_by({
-        bucket: bucket,
-        key_attributes: serialize_key_attributes(key_attributes)
-      })
-      counter.add amount
-      counter.save
+    swallowing_errors do
+      in_transaction do
+        counter = Counter.find_or_initialize_by({
+          bucket: bucket,
+          key_attributes: serialize_key_attributes(key_attributes)
+        })
+        counter.add amount
+        counter.save
+      end
     end
   end
 
@@ -45,6 +49,14 @@ module InsteddTelemetry
   #
   def self.in_transaction(&block)
     ActiveRecord::Base.transaction(requires_new: true, &block)
+  end
+
+  def self.swallowing_errors(&block)
+    begin
+      yield
+    rescue
+      Rails.logger.warn "[instedd-telemetry] An error occurred while trying to save usage stats"
+    end
   end
 
 end

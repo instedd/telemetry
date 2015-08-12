@@ -9,17 +9,17 @@
 # from scratch. The latter is a flawed and unsustainable approach (the more migrations
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
-# It's strongly recommended to check this file into your version control system.
+# It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150812133129) do
+ActiveRecord::Schema.define(version: 20150812133129) do
 
-  create_table "instedd_telemetry_counters", :force => true do |t|
+  create_table "instedd_telemetry_counters", force: :cascade do |t|
     t.string  "bucket"
     t.text    "key_attributes"
-    t.integer "count",          :default => 0
+    t.integer "count",          default: 0
   end
 
-  create_table "instedd_telemetry_set_occurrences", :force => true do |t|
+  create_table "instedd_telemetry_set_occurrences", force: :cascade do |t|
     t.string "bucket"
     t.text   "key_attributes"
     t.string "element"
