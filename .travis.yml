@@ -8,4 +8,4 @@ env:
 before_script:
   - bundle install
 script:
-  - bundle exec rake test
+  - RAILS_ENV=test bundle exec rake test
