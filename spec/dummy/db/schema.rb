@@ -11,18 +11,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812133129) do
+ActiveRecord::Schema.define(version: 20150812190708) do
 
   create_table "instedd_telemetry_counters", force: :cascade do |t|
+    t.integer "period_id"
     t.string  "bucket"
     t.text    "key_attributes"
     t.integer "count",          default: 0
   end
 
+  create_table "instedd_telemetry_periods", force: :cascade do |t|
+    t.datetime "beginning"
+    t.datetime "end"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "instedd_telemetry_set_occurrences", force: :cascade do |t|
-    t.string "bucket"
-    t.text   "key_attributes"
-    t.string "element"
+    t.integer "period_id"
+    t.string  "bucket"
+    t.text    "key_attributes"
+    t.string  "element"
   end
 
 end

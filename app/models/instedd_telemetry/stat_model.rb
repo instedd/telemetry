@@ -1,7 +1,9 @@
 module InsteddTelemetry
-  class Model < ActiveRecord::Base
+  class StatModel < ActiveRecord::Base
 
     self.abstract_class = true
+
+    belongs_to :period
     
     unless self.respond_to? :find_or_initialize_by
       def self.find_or_initialize_by(attributes, &block)

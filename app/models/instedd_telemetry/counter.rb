@@ -1,5 +1,5 @@
 module InsteddTelemetry
-  class Counter < Model
+  class Counter < StatModel
 
     def add(amount)
       self.count ||= 0

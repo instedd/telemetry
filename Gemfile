@@ -24,6 +24,10 @@ end
 gem 'rails', rails_version_spec
 gem 'test-unit'
 
+group :test do
+  gem 'timecop'
+end
+
 group :development, :test do
   gem 'pry-byebug' unless ENV["TRAVIS"]
 end
