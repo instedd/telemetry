@@ -58,5 +58,13 @@ module InsteddTelemetry
       end
     end
 
+    def self.periods_to_send
+      Period.where("end < ? and stats_sent_at IS NULL", Time.now)
+    end
+
+    def self.run_for_pending_periods(server_url)
+      self.periods_to_send.each { |p| self.new(p, server_url).run }
+    end
+
   end
 end

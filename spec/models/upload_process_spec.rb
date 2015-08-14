@@ -188,4 +188,26 @@ describe InsteddTelemetry::UploadProcess do
 
   end
 
+  describe "periods to upload" do
+
+    it "sends stats for finished periods that were not reporter before" do
+      t0 = Time.now.utc
+      t1 = t0 + InsteddTelemetry::Period.span
+      t2 = t1 + InsteddTelemetry::Period.span
+      t3 = t2 + InsteddTelemetry::Period.span
+      t4 = t3 + InsteddTelemetry::Period.span
+
+
+      p1 = InsteddTelemetry::Period.create(beginning: t0, end: t1)
+      p2 = InsteddTelemetry::Period.create(beginning: t1, end: t2, stats_sent_at: (t2 + 1.day))
+      p3 = InsteddTelemetry::Period.create(beginning: t2, end: t3)
+      p4 = InsteddTelemetry::Period.create(beginning: t3, end: t4)
+
+      Timecop.freeze(p4.end - 1.day)
+
+      expect(UploadProcess.periods_to_send).to eq([p1, p3])
+    end
+
+  end
+
 end
