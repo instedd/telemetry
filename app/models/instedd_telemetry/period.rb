@@ -1,6 +1,14 @@
 module InsteddTelemetry
   class Period < ActiveRecord::Base
 
+    def already_finished?
+      self.end < Time.now
+    end
+
+    def stats_already_sent?
+      !stats_sent_at.nil?
+    end
+
     def self.span
       1.week
     end

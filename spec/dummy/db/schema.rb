@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150812190708) do
+ActiveRecord::Schema.define(version: 20150814133344) do
 
   create_table "instedd_telemetry_counters", force: :cascade do |t|
     t.integer "period_id"
@@ -23,8 +23,9 @@ ActiveRecord::Schema.define(version: 20150812190708) do
   create_table "instedd_telemetry_periods", force: :cascade do |t|
     t.datetime "beginning"
     t.datetime "end"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "stats_sent_at"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
   create_table "instedd_telemetry_set_occurrences", force: :cascade do |t|

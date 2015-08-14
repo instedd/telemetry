@@ -26,6 +26,7 @@ gem 'test-unit'
 
 group :test do
   gem 'timecop'
+  gem 'webmock'
 end
 
 group :development, :test do

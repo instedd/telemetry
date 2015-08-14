@@ -3,7 +3,30 @@ include InsteddTelemetry
 
 describe InsteddTelemetry::UploadProcess do
 
-  describe "stats building" do
+  let(:server_url) { "http://instedd.org/telemetry/" }
+
+  describe "validations" do
+
+    it "cannot be built without period or server url" do
+      expect{ UploadProcess.new(nil, server_url) }.to     raise_error("Undefined period")
+      expect{ UploadProcess.new(Period.current, nil) }.to raise_error("Undefined server URL")
+    end
+
+    it "cannot be built for unfinished periods" do
+      Timecop.freeze
+
+      expect{ UploadProcess.new(Period.current, server_url) }.to raise_error("Period hasn't finished yet")
+    end
+
+  end
+
+
+  describe "stats format" do
+
+    def last_period_stats
+      Timecop.freeze(Period.last.end + 1.day)
+      UploadProcess.new(Period.last, "http://example.com").stats
+    end
 
     it "builds counters and sets" do
       InsteddTelemetry.counter_add(:calls, {project: 1}, 2)
@@ -11,8 +34,7 @@ describe InsteddTelemetry::UploadProcess do
       InsteddTelemetry.set_add(:channels, {project: 1}, :smpp)
       InsteddTelemetry.set_add(:channels, {project: 1}, :other)
 
-      stats = UploadProcess.new(Period.last).stats
-      expect(stats).to eq({
+      expect(last_period_stats).to eq({
         "counters" => [
           { "type" => "calls", "key" => { "project" => 1 }, "value" => 3 }
         ],
@@ -30,8 +52,7 @@ describe InsteddTelemetry::UploadProcess do
       InsteddTelemetry.set_add(:users, {project: 1}, :foo)
       InsteddTelemetry.set_add(:users, {project: 1}, :bar)
 
-      stats = UploadProcess.new(Period.last).stats
-      expect(stats).to eq({
+      expect(last_period_stats).to eq({
         "counters" => [
           {
             "type" => "calls",
@@ -70,9 +91,8 @@ describe InsteddTelemetry::UploadProcess do
       InsteddTelemetry.set_add(:users, {project: 1}, :foo)
       InsteddTelemetry.set_add(:users, {project: 2}, :bar)
 
-      stats = UploadProcess.new(Period.last).stats
 
-      expect(stats).to eq({
+      expect(last_period_stats).to eq({
         "counters" => [
           {
             "type" => "calls",
@@ -118,6 +138,52 @@ describe InsteddTelemetry::UploadProcess do
           }
         ]
       })
+    end
+
+  end
+
+  describe "stats upload" do
+
+    before(:each) do
+      stub_request(:post, server_url).to_return(status: 200, headers: {})
+      
+      InsteddTelemetry.counter_add(:calls, {project: 1})
+      Timecop.travel(Period.last.end + 1.day)
+    end
+    
+    let(:server_request) do
+      a_request(:post, server_url).with({
+        body: process.stats.to_json,
+        headers: {"Content-Type" => "application/json"}
+      })
+    end
+    
+    let(:process)    { UploadProcess.new(Period.last, server_url) }
+
+    it "sends stats to the server" do
+      process.run
+
+      expect(server_request).to have_been_made.once
+    end
+
+    it "marks period as already reported" do
+      process.run
+      
+      expect(Period.last.stats_sent_at.to_i).to eq(Time.now.to_i)
+    end
+
+    it "doesn't send anything for repeated runs over already sent period" do
+      process.run
+      process.run
+      
+      expect(server_request).to have_been_made.once
+    end
+
+    it "doesn't mark period as reported if upload request failed" do
+      stub_request(:post, server_url).to_return(status: 400, headers: {})
+      process.run
+
+      expect(Period.last.stats_already_sent?).to be(false)
     end
 
   end
