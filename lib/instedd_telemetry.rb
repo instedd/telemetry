@@ -1,4 +1,5 @@
 require "instedd_telemetry/engine"
+require "instedd_telemetry/agent"
 
 module InsteddTelemetry
 
