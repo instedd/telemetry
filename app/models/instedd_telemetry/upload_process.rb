@@ -66,5 +66,32 @@ module InsteddTelemetry
       self.periods_to_send.each { |p| self.new(p, server_url).run }
     end
 
+    def self.start_upload_process
+      while true
+        begin
+          periods    = InsteddTelemetry::Period.ready_for_upload
+          server_url = InsteddTelemetry.configuration.server_url
+          periods.each do |p|
+            UploadProcess.new(period, server_url).run
+          end
+        rescue Exception => e
+          InsteddTelemetry::Logging.log_exception e, "An error occurred while trying to upload usage stats"
+        end
+        sleep 1.hour
+      end
+    end
+
+    def self.current_period
+      if current_period_cached
+        @current_period
+      else
+        @current_period = InsteddTelemetry::Period.current
+      end
+    end
+
+    def self.current_period_cached
+      !Rails.env.test? && @current_period && DateTime.now < @current_period.end
+    end
+
   end
 end

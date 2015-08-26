@@ -90,4 +90,13 @@ describe InsteddTelemetry do
    expect(counter.period).to eq(InsteddTelemetry::Period.current)
   end
 
+  describe "config" do
+
+    it "allows to change telemetry server configuration" do
+      InsteddTelemetry.configure { |conf| conf.server_url = "http://example.com" }
+      expect(InsteddTelemetry.configuration.server_url).to eq("http://example.com")
+    end
+
+  end
+
 end

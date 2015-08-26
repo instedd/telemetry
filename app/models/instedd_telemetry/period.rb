@@ -1,6 +1,8 @@
 module InsteddTelemetry
   class Period < ActiveRecord::Base
 
+    scope :ready_for_upload, -> { where("stats_sent_at IS NULL AND stats_sent_at < ?", Time.now) }
+
     def already_finished?
       self.end < Time.now
     end
