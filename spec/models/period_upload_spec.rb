@@ -1,21 +1,21 @@
 require 'spec_helper'
 include InsteddTelemetry
 
-describe InsteddTelemetry::UploadProcess do
+describe InsteddTelemetry::PeriodUpload do
 
   let(:server_url) { "http://instedd.org/telemetry/" }
 
   describe "validations" do
 
     it "cannot be built without period or server url" do
-      expect{ UploadProcess.new(nil, server_url) }.to     raise_error("Undefined period")
-      expect{ UploadProcess.new(Period.current, nil) }.to raise_error("Undefined server URL")
+      expect{ PeriodUpload.new(nil, server_url) }.to     raise_error("Undefined period")
+      expect{ PeriodUpload.new(Period.current, nil) }.to raise_error("Undefined server URL")
     end
 
     it "cannot be built for unfinished periods" do
       Timecop.freeze
 
-      expect{ UploadProcess.new(Period.current, server_url) }.to raise_error("Period hasn't finished yet")
+      expect{ PeriodUpload.new(Period.current, server_url) }.to raise_error("Period hasn't finished yet")
     end
 
   end
@@ -25,7 +25,7 @@ describe InsteddTelemetry::UploadProcess do
 
     def last_period_stats
       Timecop.freeze(Period.last.end + 1.day)
-      UploadProcess.new(Period.last, "http://example.com").stats
+      PeriodUpload.new(Period.last, "http://example.com").stats
     end
 
     it "builds counters and sets" do
@@ -158,7 +158,7 @@ describe InsteddTelemetry::UploadProcess do
       })
     end
     
-    let(:process)    { UploadProcess.new(Period.last, server_url) }
+    let(:process)    { PeriodUpload.new(Period.last, server_url) }
 
     it "sends stats to the server" do
       process.run

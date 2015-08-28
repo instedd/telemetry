@@ -12,7 +12,7 @@ module InsteddTelemetry
           bucket: bucket,
           key_attributes: serialize_key_attributes(key_attributes),
           element: element,
-          period_id: UploadProcess.current_period.id
+          period_id: current_period.id
         })
       end
     end
@@ -24,7 +24,7 @@ module InsteddTelemetry
         counter = Counter.find_or_initialize_by({
           bucket: bucket,
           key_attributes: serialize_key_attributes(key_attributes),
-          period_id: UploadProcess.current_period.id
+          period_id: current_period.id
         })
         counter.add amount
         counter.save
@@ -70,6 +70,18 @@ module InsteddTelemetry
     rescue Exception => e
       Logging.log_exception e, "An error occurred while trying to save usage stats"
     end
+  end
+
+  def self.current_period
+    if current_period_cached
+      @current_period
+    else
+      @current_period = InsteddTelemetry::Period.current
+    end
+  end
+
+  def self.current_period_cached
+    !Rails.env.test? && @current_period && DateTime.now < @current_period.end
   end
 
 end

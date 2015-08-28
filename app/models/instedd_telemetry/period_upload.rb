@@ -1,5 +1,5 @@
 module InsteddTelemetry
-  class UploadProcess
+  class PeriodUpload
 
     def initialize(period, server_url)
       raise "Undefined period"           unless period.present?
@@ -58,7 +58,7 @@ module InsteddTelemetry
       end
     end
 
-    def self.start_upload_process
+    def self.start_background_process
       while true
         begin
           server_url = InsteddTelemetry.configuration.server_url
@@ -66,7 +66,8 @@ module InsteddTelemetry
           InsteddTelemetry::Period.lock_for_upload do |periods|
             if periods.any?
               periods.each do |p|
-                UploadProcess.new(p, server_url).run
+                PeriodUpload.new(p, server_url).run
+                Logging.log :info, "Uploaded information for period #{p.beginning}-#{p.end}"
               end
             else
               Logging.log :info, "There is no new information to upload"
@@ -77,18 +78,6 @@ module InsteddTelemetry
         end
         sleep 1.hour
       end
-    end
-
-    def self.current_period
-      if current_period_cached
-        @current_period
-      else
-        @current_period = InsteddTelemetry::Period.current
-      end
-    end
-
-    def self.current_period_cached
-      !Rails.env.test? && @current_period && DateTime.now < @current_period.end
     end
 
   end
