@@ -7,7 +7,7 @@ module InsteddTelemetry
       raise "Period hasn't finished yet" unless period.already_finished?
       
       @period = period
-      @server_url = URI.parse(server_url)
+      @server_enpoint = URI.join(server_url, "/api/v1/installations/#{InsteddTelemetry.instance_id}/events")
     end
 
     def run
@@ -16,10 +16,10 @@ module InsteddTelemetry
 
     def post(stats)
       # Ruby 1.9.3 requires url to be passed as string for Post.new
-      req = Net::HTTP::Post.new(@server_url.to_s, {'Content-Type' =>'application/json'})
+      req = Net::HTTP::Post.new(@server_enpoint.to_s, {'Content-Type' =>'application/json'})
       req.body = stats.to_json
 
-      response = Net::HTTP.new(@server_url.hostname, @server_url.port).request(req)
+      response = Net::HTTP.new(@server_enpoint.hostname, @server_enpoint.port).request(req)
       return response.code == "200"
     end
 

@@ -40,6 +40,10 @@ module InsteddTelemetry
     @configuration ||= Configuration.new
   end
 
+  def self.instance_id
+    @instance_id ||= Setting.get(:installation_id)
+  end
+
   private
 
   def self.serialize_key_attributes attributes

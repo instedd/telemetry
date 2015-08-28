@@ -3,7 +3,7 @@ include InsteddTelemetry
 
 describe InsteddTelemetry::PeriodUpload do
 
-  let(:server_url) { "http://instedd.org/telemetry/" }
+  let(:server_url) { "http://instedd.org" }
 
   describe "validations" do
 
@@ -144,15 +144,17 @@ describe InsteddTelemetry::PeriodUpload do
 
   describe "stats upload" do
 
+    let(:server_endpoint) { "#{server_url}/api/v1/installations/#{InsteddTelemetry.instance_id}/events" }
+
     before(:each) do
-      stub_request(:post, server_url).to_return(status: 200, headers: {})
+      stub_request(:post, server_endpoint).to_return(status: 200, headers: {})
       
       InsteddTelemetry.counter_add(:calls, {project: 1})
       Timecop.travel(Period.last.end + 1.day)
     end
     
     let(:server_request) do
-      a_request(:post, server_url).with({
+      a_request(:post, server_endpoint).with({
         body: process.stats.to_json,
         headers: {"Content-Type" => "application/json"}
       })
@@ -180,7 +182,7 @@ describe InsteddTelemetry::PeriodUpload do
     end
 
     it "doesn't mark period as reported if upload request failed" do
-      stub_request(:post, server_url).to_return(status: 400, headers: {})
+      stub_request(:post, server_endpoint).to_return(status: 400, headers: {})
       process.run
 
       expect(Period.last.stats_already_sent?).to be(false)
