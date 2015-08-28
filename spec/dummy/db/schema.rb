@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150828135815) do
+ActiveRecord::Schema.define(version: 20150828220245) do
 
   create_table "instedd_telemetry_counters", force: :cascade do |t|
     t.integer "period_id"
@@ -36,5 +36,12 @@ ActiveRecord::Schema.define(version: 20150828135815) do
     t.text    "key_attributes"
     t.string  "element"
   end
+
+  create_table "instedd_telemetry_settings", force: :cascade do |t|
+    t.string "key"
+    t.string "value"
+  end
+
+  add_index "instedd_telemetry_settings", ["key"], name: "index_instedd_telemetry_settings_on_key", unique: true
 
 end
