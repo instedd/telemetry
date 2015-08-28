@@ -41,7 +41,7 @@ module InsteddTelemetry
   end
 
   def self.instance_id
-    @instance_id ||= Setting.get(:installation_id)
+    @instance_id ||= load_instance_id
   end
 
   private
@@ -86,6 +86,14 @@ module InsteddTelemetry
 
   def self.current_period_cached
     !Rails.env.test? && @current_period && DateTime.now < @current_period.end
+  end
+
+  def self.load_instance_id
+    id_setting = InsteddTelemetry::Setting.find_or_create_by(key: :installation_id) do |guid_setting|
+      guid_setting.value = SecureRandom.uuid
+    end
+
+    id_setting.value
   end
 
 end
