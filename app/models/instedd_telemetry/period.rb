@@ -1,8 +1,6 @@
 module InsteddTelemetry
   class Period < ActiveRecord::Base
 
-    scope :ready_for_upload, -> { where("stats_sent_at IS NULL AND stats_sent_at < ?", Time.now) }
-
     def already_finished?
       self.end < Time.now
     end
@@ -35,6 +33,24 @@ module InsteddTelemetry
         end
       else
         create({beginning: now, end: now + span})
+      end
+    end
+
+    def self.lock_for_upload
+      now = Time.now
+      lock_owner = SecureRandom.uuid
+      lock_expiration = now + 15.minutes
+
+      locked_count = self.where("stats_sent_at IS NULL AND end < ?", now)
+                         .where("lock_owner IS NULL OR lock_expiration < ?", now)
+                         .update_all(lock_owner: lock_owner, lock_expiration: lock_expiration)
+
+      if locked_count > 0
+        periods = self.where("lock_owner = ?", lock_owner)
+        yield periods
+        periods.update_all(lock_owner: nil, lock_expiration: nil)
+      else
+        yield []
       end
     end
 

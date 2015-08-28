@@ -58,24 +58,22 @@ module InsteddTelemetry
       end
     end
 
-    def self.periods_to_send
-      Period.where("end < ? and stats_sent_at IS NULL", Time.now)
-    end
-
-    def self.run_for_pending_periods(server_url)
-      self.periods_to_send.each { |p| self.new(p, server_url).run }
-    end
-
     def self.start_upload_process
       while true
         begin
-          periods    = InsteddTelemetry::Period.ready_for_upload
           server_url = InsteddTelemetry.configuration.server_url
-          periods.each do |p|
-            UploadProcess.new(period, server_url).run
+          
+          InsteddTelemetry::Period.lock_for_upload do |periods|
+            if periods.any?
+              periods.each do |p|
+                UploadProcess.new(p, server_url).run
+              end
+            else
+              Logging.log :info, "There is no new information to upload"
+            end
           end
         rescue Exception => e
-          InsteddTelemetry::Logging.log_exception e, "An error occurred while trying to upload usage stats"
+          Logging.log_exception e, "An error occurred while trying to upload usage stats"
         end
         sleep 1.hour
       end

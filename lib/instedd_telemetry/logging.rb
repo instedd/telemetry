@@ -1,9 +1,13 @@
 module InsteddTelemetry::Logging
 
+  def self.log(level, message)
+    Rails.logger.send(level, "[instedd-telemetry] #{message}")
+  end
+
   def self.log_exception e, extra_info
-    Rails.logger.error "[instedd-telemetry] #{extra_info}" if extra_info
-    Rails.logger.error e.message
-    Rails.logger.error "\t#{e.backtrace.join("\n\t")}"
+    log :error, "[instedd-telemetry] #{extra_info}" if extra_info
+    log :error, e.message
+    log :error, "\t#{e.backtrace.join("\n\t")}"
   end
 
 end
