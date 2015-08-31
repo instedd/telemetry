@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
   mount InsteddTelemetry::Engine => "/instedd_telemetry"
 
-  root 'home#index'
+  root to: 'home#index'
 end
