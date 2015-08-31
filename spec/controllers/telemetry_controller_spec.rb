@@ -72,5 +72,24 @@ describe InsteddTelemetry::TelemetryController do
 
   end
 
+  describe "dismissing banner" do
+
+    it "stores setting" do
+      get :dismiss
+      expect(Setting.get_bool(:dismissed)).to be_truthy
+    end
+
+    it "redirects to root by defeault" do
+      get :dismiss
+      expect(response).to redirect_to("/")
+    end
+
+    it "redirects to specified url if present" do
+      get :dismiss, { redirect_url: "/foo" }
+      expect(response).to redirect_to("/foo")
+    end
+
+  end
+
 
 end

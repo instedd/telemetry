@@ -2,7 +2,7 @@
 <div class="telemetry-warning">
   <h3>WARNING</h3>
   <p>TELEMETRY IS RUNNING IN THIS SERVER!!!!!</p>
-  <%= link_to 'Dismiss',  instedd_telemetry.dismiss_path %>
+  <%= link_to 'Dismiss',  instedd_telemetry.dismiss_path(redirect_url: request.fullpath) %>
   <%= link_to 'Configure',  instedd_telemetry.configure_path %>
 </div>
 <% end %>

@@ -4,15 +4,14 @@ module InsteddTelemetry
     before_filter :check_settings_not_set
 
     def dismiss
-      # TO-DO
+      InsteddTelemetry::Setting.set(:dismissed, true)
+      redirect_to redirect_url
     end
 
     def configuration
     end
 
     def configuration_update
-      url = params[:redirect_url] || "/"
-
       settings = {
         disable_upload: !params[:telemetry_enabled].present?,
         dismissed: true
@@ -26,13 +25,17 @@ module InsteddTelemetry
 
 
       flash[:telemetry_notice] = "Thank you for helping us improve our tools!"
-      redirect_to(url)
+      redirect_to redirect_url
     end
 
     def check_settings_not_set
       if InsteddTelemetry::Setting.where(key: :disable_upload).any?
         raise ActionController::RoutingError.new('Not Found')
       end
+    end
+
+    def redirect_url
+      params[:redirect_url] || "/"
     end
 
   end

@@ -14,8 +14,7 @@ RSpec.describe 'shared/_warning.html.erb' do
 
     it 'contains link to dismiss' do
       render partial: 'shared/warning'
-
-      expect(rendered).to have_link 'Dismiss', href: instedd_telemetry.dismiss_path
+      expect(rendered).to have_link 'Dismiss'
     end
 
     it 'contains link to configure' do
