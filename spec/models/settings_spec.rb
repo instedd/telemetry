@@ -38,4 +38,19 @@ describe InsteddTelemetry::Setting do
     expect(Setting.get_bool(:baz)).to be_nil
   end
 
+  it "allows setting multiple values at once" do
+    Setting.set(:a, 1)
+    Setting.set(:b, 2)
+    Setting.set(:c, 3)
+
+    Setting.set_all({
+      a: 10,
+      b: 20
+    })
+
+    expect(Setting.get(:a)).to eq("10")
+    expect(Setting.get(:b)).to eq("20")
+    expect(Setting.get(:c)).to eq("3")
+  end
+
 end

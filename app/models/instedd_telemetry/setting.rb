@@ -22,5 +22,19 @@ module InsteddTelemetry
       setting.save
     end
 
+    def self.set_all(setting_values)
+      setting_values = setting_values.clone.with_indifferent_access
+      
+      self.where(key: setting_values.keys).each do |s|
+        s.value = setting_values.delete(s.key)
+        s.save
+      end
+
+      setting_values.each do |k,v|
+        Setting.create(key: k, value: v.to_s)
+      end
+
+    end
+
   end
 end

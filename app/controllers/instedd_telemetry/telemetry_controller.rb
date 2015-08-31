@@ -13,11 +13,17 @@ module InsteddTelemetry
     def configuration_update
       url = params[:redirect_url] || "/"
 
-      disable_upload = !params[:telemetry_enabled].present?
+      settings = {
+        disable_upload: !params[:telemetry_enabled].present?,
+        dismissed: true
+      }
+      
+      if params[:admin_email]
+        settings[:admin_email] = params[:admin_email].strip
+      end
+      
+      InsteddTelemetry::Setting.set_all(settings)
 
-      InsteddTelemetry::Setting.set(:disable_upload, disable_upload)
-      InsteddTelemetry::Setting.set(:admin_email, params[:admin_email].strip) if params[:admin_email]
-      InsteddTelemetry::Setting.set(:dismissed, true)
 
       flash[:telemetry_notice] = "Thank you for helping us improve our tools!"
       redirect_to(url)
