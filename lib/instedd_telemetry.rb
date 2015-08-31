@@ -44,6 +44,10 @@ module InsteddTelemetry
     @instance_id ||= load_instance_id
   end
 
+  def self.upload_enabled
+    not Setting.get_bool(:disable_upload)
+  end
+
   private
 
   def self.serialize_key_attributes attributes

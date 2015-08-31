@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe 'shared/_warning.html.erb' do
   context 'not dismissed' do
     before :each do
-      allow(InsteddTelemetry::Setting).to receive(:get).with(:dismissed).and_return(false)
+      InsteddTelemetry::Setting.set(:dismissed, false)
     end
 
     it 'displays a warning if not dismissed' do
@@ -27,7 +27,7 @@ RSpec.describe 'shared/_warning.html.erb' do
 
   context 'dismissed' do
     before :each do
-      allow(InsteddTelemetry::Setting).to receive(:get).with(:dismissed).and_return(true)
+      InsteddTelemetry::Setting.set(:dismissed, true)
     end
 
     it 'doesnt display a warning if dismissed' do

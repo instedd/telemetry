@@ -61,16 +61,20 @@ module InsteddTelemetry
     def self.start_background_process
       while true
         begin
-          server_url = InsteddTelemetry.configuration.server_url
-          
-          InsteddTelemetry::Period.lock_for_upload do |periods|
-            if periods.any?
-              periods.each do |p|
-                PeriodUpload.new(p, server_url).run
-                Logging.log :info, "Uploaded information for period #{p.beginning}-#{p.end}"
+          if !InsteddTelemetry.upload_enabled
+            Logging.log :info, "User opted-out of telemetry report uploads, will not upload usage information."
+          else
+            server_url = InsteddTelemetry.configuration.server_url
+            
+            InsteddTelemetry::Period.lock_for_upload do |periods|
+              if periods.any?
+                periods.each do |p|
+                  PeriodUpload.new(p, server_url).run
+                  Logging.log :info, "Uploaded information for period #{p.beginning}-#{p.end}"
+                end
+              else
+                Logging.log :info, "There is no new information to upload"
               end
-            else
-              Logging.log :info, "There is no new information to upload"
             end
           end
         rescue Exception => e

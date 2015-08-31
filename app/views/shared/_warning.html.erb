@@ -1,4 +1,4 @@
-<% unless InsteddTelemetry::Setting.get(:dismissed) %>
+<% unless InsteddTelemetry::Setting.get_bool(:dismissed) %>
 <div class="telemetry-warning">
   <h3>WARNING</h3>
   <p>TELEMETRY IS RUNNING IN THIS SERVER!!!!!</p>

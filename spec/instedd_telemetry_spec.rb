@@ -97,6 +97,15 @@ describe InsteddTelemetry do
       expect(InsteddTelemetry.configuration.server_url).to eq("http://example.com")
     end
 
+    it "uploads data by default" do
+      expect(InsteddTelemetry.upload_enabled).to be_truthy
+    end
+
+    it "doesn't send data if user opts out" do
+      InsteddTelemetry::Setting.set(:disable_upload, "true")
+      expect(InsteddTelemetry.upload_enabled).to be_falsey
+    end
+
   end
 
 end

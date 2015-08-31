@@ -28,4 +28,14 @@ describe InsteddTelemetry::Setting do
       Setting.create(key: :foo, value: :baz)
     }.to raise_error(ActiveRecord::RecordNotUnique)
   end
+
+  it "allows to get values parsed as boolean" do
+    Setting.set(:foo, "true")
+    Setting.set(:bar, "false")
+
+    expect(Setting.get_bool(:foo)).to eq(true)
+    expect(Setting.get_bool(:bar)).to eq(false)
+    expect(Setting.get_bool(:baz)).to be_nil
+  end
+
 end
