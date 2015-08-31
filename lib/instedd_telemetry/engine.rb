@@ -6,6 +6,12 @@ module InsteddTelemetry
       InsteddTelemetry::Agent.new.auto_start
     end
 
+    initializer 'instedd_telemetry.action_controller' do |app|
+      ActiveSupport.on_load :action_controller do
+        helper InsteddTelemetry::WarningHelper
+      end
+    end
+
     config.generators do |g|
       g.test_framework      :rspec,        :fixture => false
       g.assets false
