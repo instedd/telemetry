@@ -148,6 +148,57 @@ describe InsteddTelemetry::PeriodUpload do
 
   end
 
+  describe "custom pull stats" do
+
+    it "allows to add additional sets and counters before uploding" do
+      period = Period.current
+      Timecop.travel(1.week)
+
+      pull_stats = {
+        "counters" => [
+          { "type" => "calls", "key" => { "project" => 1 }, "value" => 3 }
+        ],
+        "sets" => [
+          { "type" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+        ]
+      }
+      
+      upload = PeriodUpload.new(period, "http://example.com")
+      upload.collect_pull_stats_with [
+        StatCollectors::BlockCollector.new { |p| pull_stats }
+      ]
+
+      expect(upload.stats["counters"]).to eq(pull_stats["counters"])
+      expect(upload.stats["sets"]).to eq(pull_stats["sets"])
+    end
+
+    it "merges pull and push stats" do
+      InsteddTelemetry.counter_add(:calls, {project: 1}, 20)
+      InsteddTelemetry.counter_add(:calls, {project: 1}, 50)
+
+      pull_stats = {
+        "counters" => [
+          { "type" => "calls", "key" => { "project" => 2 }, "value" => 3 }
+        ]
+      }
+
+      period = Period.current
+      Timecop.travel(1.week)
+      
+      upload = PeriodUpload.new(period, "http://example.com")
+      upload.collect_pull_stats_with [
+        StatCollectors::BlockCollector.new { |p| pull_stats }
+      ]
+      
+      counters = upload.stats["counters"]
+
+      expect(counters.length).to eq(2)
+      expect(counters[0]).to eq({"type"=>"calls", "key"=>{"project"=>1}, "value"=>70})
+      expect(counters[1]).to eq({"type"=>"calls", "key"=>{"project"=>2}, "value"=>3})
+    end
+
+  end
+
   describe "stats upload" do
 
     let(:server_endpoint) { "#{server_url}/api/v1/installations/#{InsteddTelemetry.instance_id}/events" }

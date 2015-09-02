@@ -90,12 +90,7 @@ describe InsteddTelemetry do
    expect(counter.period).to eq(InsteddTelemetry::Period.current)
   end
 
-  describe "config" do
-
-    it "allows to change telemetry server configuration" do
-      InsteddTelemetry.configure { |conf| conf.server_url = "http://example.com" }
-      expect(InsteddTelemetry.configuration.server_url).to eq("http://example.com")
-    end
+  describe "user settings" do
 
     it "uploads data by default" do
       expect(InsteddTelemetry.upload_enabled).to be_truthy
@@ -104,6 +99,24 @@ describe InsteddTelemetry do
     it "doesn't send data if user opts out" do
       InsteddTelemetry::Setting.set(:disable_upload, "true")
       expect(InsteddTelemetry.upload_enabled).to be_falsey
+    end
+
+  end
+
+  describe "engine setup" do
+
+    it "yields configuration object" do
+      InsteddTelemetry.setup do |configuration|
+        expect(configuration).to be_instance_of(InsteddTelemetry::Configuration)
+      end
+    end
+
+    it "allows configuration with instance eval if block with no parameter is passed" do
+      yielded_object = nil
+      InsteddTelemetry.setup do
+        yielded_object = self
+      end
+      expect(yielded_object).to be_instance_of(InsteddTelemetry::Configuration)
     end
 
   end

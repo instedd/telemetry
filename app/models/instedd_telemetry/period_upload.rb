@@ -1,13 +1,18 @@
 module InsteddTelemetry
   class PeriodUpload
 
-    def initialize(period, server_url)
+    def initialize(period, server_url, pull_collectors = [])
       raise "Undefined period"           unless period.present?
       raise "Undefined server URL"       unless server_url.present?
       raise "Period hasn't finished yet" unless period.already_finished?
       
       @period = period
       @server_enpoint = URI.join(server_url, "/api/v1/installations/#{InsteddTelemetry.instance_id}/events")
+      @pull_collectors = pull_collectors
+    end
+
+    def collect_pull_stats_with(collectors)
+      @pull_collectors += collectors
     end
 
     def run
@@ -24,6 +29,17 @@ module InsteddTelemetry
     end
 
     def stats
+      @pull_collectors.inject(pushed_stats_json) do |result, collector|
+        collector_stats = collector.collect_stats(@period)
+
+        result.tap do |r|
+          r["counters"].concat(collector_stats["counters"]) if collector_stats["counters"]
+          r["sets"].concat(collector_stats["sets"])         if collector_stats["sets"]
+        end
+      end
+    end
+
+    def pushed_stats_json
       counters = Counter.where(period_id: @period.id)
       set_occurrences = SetOccurrence.where(period_id: @period.id)
 
@@ -69,11 +85,12 @@ module InsteddTelemetry
             Logging.log :info, "User opted-out of telemetry report uploads, will not upload usage information."
           else
             server_url = InsteddTelemetry.configuration.server_url
-            
+            custom_collectors = InsteddTelemetry.configuration.collectors
+
             InsteddTelemetry::Period.lock_for_upload do |periods|
               if periods.any?
                 periods.each do |p|
-                  PeriodUpload.new(p, server_url).run
+                  PeriodUpload.new(p, server_url, custom_collectors).run
                   Logging.log :info, "Uploaded information for period #{p.beginning}-#{p.end}"
                 end
               else

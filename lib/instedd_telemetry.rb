@@ -1,7 +1,6 @@
-require "instedd_telemetry/engine"
-require "instedd_telemetry/agent"
-require "instedd_telemetry/logging"
-require "instedd_telemetry/configuration"
+Dir[File.expand_path("../**/*.rb", __FILE__)].each do |file|
+  require file
+end
 
 module InsteddTelemetry
 
@@ -32,8 +31,13 @@ module InsteddTelemetry
     end
   end
 
-  def self.configure
-    yield configuration
+  def self.setup(&block)
+    case block.arity
+    when 0
+      configuration.instance_eval(&block)
+    when 1
+      block.call(configuration)
+    end
   end
 
   def self.configuration
