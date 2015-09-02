@@ -28,14 +28,13 @@ module InsteddTelemetry
       set_occurrences = SetOccurrence.where(period_id: @period.id)
 
       {
+        "period" =>  {
+          "beginning" => @period.beginning.iso8601,
+          "end" => @period.end.iso8601
+        },
         "counters" => counters_json(counters),
         "sets" => sets_json(set_occurrences)
       }
-    end
-
-    def mark_period_as_sent
-      @period.stats_sent_at = Time.now.utc
-      @period.save!
     end
 
     def counters_json(counters)
@@ -56,6 +55,11 @@ module InsteddTelemetry
           "elements" => occurrences.map(&:element)
         }
       end
+    end
+
+    def mark_period_as_sent
+      @period.stats_sent_at = Time.now.utc
+      @period.save!
     end
 
     def self.start_background_process

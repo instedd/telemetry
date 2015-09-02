@@ -15,7 +15,7 @@ describe InsteddTelemetry::PeriodUpload do
     it "cannot be built for unfinished periods" do
       Timecop.freeze
 
-      expect{ PeriodUpload.new(Period.current, server_url) }.to raise_error("Period hasn't finished yet")
+      expect{ PeriodUpload.new(InsteddTelemetry::Period.current, server_url) }.to raise_error("Period hasn't finished yet")
     end
 
   end
@@ -23,9 +23,12 @@ describe InsteddTelemetry::PeriodUpload do
 
   describe "stats format" do
 
+    let(:period)            { Period.last }
+    let(:period_date_range) { { "beginning" => period.beginning.iso8601, "end" => period.end.iso8601 } }
+
     def last_period_stats
-      Timecop.freeze(Period.last.end + 1.day)
-      PeriodUpload.new(Period.last, "http://example.com").stats
+      Timecop.freeze(period.end + 1.day)
+      PeriodUpload.new(period, "http://example.com").stats
     end
 
     it "builds counters and sets" do
@@ -35,6 +38,7 @@ describe InsteddTelemetry::PeriodUpload do
       InsteddTelemetry.set_add(:channels, {project: 1}, :other)
 
       expect(last_period_stats).to eq({
+        "period" => period_date_range,
         "counters" => [
           { "type" => "calls", "key" => { "project" => 1 }, "value" => 3 }
         ],
@@ -53,6 +57,7 @@ describe InsteddTelemetry::PeriodUpload do
       InsteddTelemetry.set_add(:users, {project: 1}, :bar)
 
       expect(last_period_stats).to eq({
+        "period" => period_date_range,
         "counters" => [
           {
             "type" => "calls",
@@ -93,6 +98,7 @@ describe InsteddTelemetry::PeriodUpload do
 
 
       expect(last_period_stats).to eq({
+        "period" => period_date_range,
         "counters" => [
           {
             "type" => "calls",
