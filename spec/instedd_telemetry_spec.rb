@@ -107,16 +107,8 @@ describe InsteddTelemetry do
 
     it "yields configuration object" do
       InsteddTelemetry.setup do |configuration|
-        expect(configuration).to be_instance_of(InsteddTelemetry::Configuration)
+        expect(configuration).to eq(InsteddTelemetry.configuration)
       end
-    end
-
-    it "allows configuration with instance eval if block with no parameter is passed" do
-      yielded_object = nil
-      InsteddTelemetry.setup do
-        yielded_object = self
-      end
-      expect(yielded_object).to be_instance_of(InsteddTelemetry::Configuration)
     end
 
   end

@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = InsteddTelemetry::VERSION
   s.authors     = ["Juan Edi"]
   s.email       = ["jedi@manas.com.ar"]
-  s.homepage    = "https://github.com/instedd/telemetry"
+  s.homepage    = "https://github.com/instedd/telemetry_rails"
   s.summary     = "Recollect and report usage stats for InSTEDD applications"
 
   s.files = Dir["{app,config,db,lib}/**/*", "Rakefile", "README.rdoc"]
