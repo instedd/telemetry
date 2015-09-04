@@ -23,7 +23,7 @@ describe InsteddTelemetry::Setting do
 
   it "fails to create record if key already present" do
     Setting.set(:foo, :bar)
-    
+
     expect {
       Setting.create(key: :foo, value: :baz)
     }.to raise_error(ActiveRecord::RecordNotUnique)
@@ -51,6 +51,34 @@ describe InsteddTelemetry::Setting do
     expect(Setting.get(:a)).to eq("10")
     expect(Setting.get(:b)).to eq("20")
     expect(Setting.get(:c)).to eq("3")
+  end
+
+  it "caches settings" do
+    Setting.set(:a, 1)
+    Setting.get(:a)
+
+    expect(Setting).not_to receive(:find_by_key).with(:a)
+    expect(Setting.get(:a)).to eq("1")
+  end
+
+  it "clear cache when setting" do
+    Setting.set(:a, 1)
+    Setting.get(:a)
+    Setting.set(:a, 2)
+
+    expect(Setting).to receive(:find_by_key).with(:a).and_return(Setting.new(value: "2"))
+
+    expect(Setting.get(:a)).to eq("2")
+  end
+
+  it "clear cache when setting all" do
+    Setting.set(:a, 1)
+    Setting.get(:a)
+    Setting.set_all(a: 2, b:5)
+
+    expect(Setting).to receive(:find_by_key).with(:a).and_return(Setting.new(value: "2"))
+
+    expect(Setting.get(:a)).to eq("2")
   end
 
 end
