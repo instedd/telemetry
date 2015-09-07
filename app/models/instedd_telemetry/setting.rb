@@ -19,7 +19,7 @@ module InsteddTelemetry
       if value.nil?
         value
       else
-        value == "true"
+        value == "true" || value == "t" || value == "1"
       end
     end
 
