@@ -6,6 +6,9 @@ describe InsteddTelemetry::TelemetryController do
   routes { InsteddTelemetry::Engine.routes }
 
   describe "settings update" do
+    before(:each) do
+      allow(InsteddTelemetry.api).to receive(:update_installation)
+    end
 
     it "stores settings in database" do
       post :configuration_update, {telemetry_enabled: "true", admin_email: "foo@bar.com"}
@@ -91,5 +94,24 @@ describe InsteddTelemetry::TelemetryController do
 
   end
 
+  describe "update installation" do
+    let(:api) { double('api')}
+
+    before :each do
+      allow(InsteddTelemetry).to receive(:api).and_return(api)
+    end
+
+    it "updates installation when setting admin email" do
+      expect(api).to receive(:update_installation).with(admin_email: 'foo@bar.com')
+
+      post :configuration_update, admin_email: 'foo@bar.com'
+    end
+
+    it "doesn't update installation if admin email is not present" do
+      expect(api).not_to receive(:update_installation)
+
+      post :configuration_update, telemetry_enabled: "true"
+    end
+  end
 
 end

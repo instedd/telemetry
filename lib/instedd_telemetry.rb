@@ -52,6 +52,10 @@ module InsteddTelemetry
     not Setting.get_bool(:disable_upload)
   end
 
+  def self.api
+    @api ||= Api.new(configuration.server_url)
+  end
+
   private
 
   def self.serialize_key_attributes attributes

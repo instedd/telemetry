@@ -3,19 +3,16 @@ include InsteddTelemetry
 
 describe InsteddTelemetry::PeriodUpload do
 
-  let(:server_url) { "http://instedd.org" }
-
   describe "validations" do
 
-    it "cannot be built without period or server url" do
-      expect{ PeriodUpload.new(nil, server_url) }.to     raise_error("Undefined period")
-      expect{ PeriodUpload.new(Period.current, nil) }.to raise_error("Undefined server URL")
+    it "cannot be built without period" do
+      expect{ PeriodUpload.new(nil) }.to raise_error("Undefined period")
     end
 
     it "cannot be built for unfinished periods" do
       Timecop.freeze
 
-      expect{ PeriodUpload.new(InsteddTelemetry::Period.current, server_url) }.to raise_error("Period hasn't finished yet")
+      expect{ PeriodUpload.new(InsteddTelemetry::Period.current) }.to raise_error("Period hasn't finished yet")
     end
 
   end
@@ -28,7 +25,7 @@ describe InsteddTelemetry::PeriodUpload do
 
     def last_period_stats
       Timecop.freeze(period.end + 1.day)
-      PeriodUpload.new(period, "http://example.com").stats
+      PeriodUpload.new(period).stats
     end
 
     it "builds counters and sets" do
@@ -162,8 +159,8 @@ describe InsteddTelemetry::PeriodUpload do
           { "type" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
         ]
       }
-      
-      upload = PeriodUpload.new(period, "http://example.com")
+
+      upload = PeriodUpload.new(period)
       upload.collect_pull_stats_with [
         StatCollectors::BlockCollector.new { |p| pull_stats }
       ]
@@ -184,12 +181,12 @@ describe InsteddTelemetry::PeriodUpload do
 
       period = Period.current
       Timecop.travel(1.week)
-      
-      upload = PeriodUpload.new(period, "http://example.com")
+
+      upload = PeriodUpload.new(period)
       upload.collect_pull_stats_with [
         StatCollectors::BlockCollector.new { |p| pull_stats }
       ]
-      
+
       counters = upload.stats["counters"]
 
       expect(counters.length).to eq(2)
@@ -200,46 +197,45 @@ describe InsteddTelemetry::PeriodUpload do
   end
 
   describe "stats upload" do
-
-    let(:server_endpoint) { "#{server_url}/api/v1/installations/#{InsteddTelemetry.instance_id}/events" }
+    let(:api) { double('api') }
+    let(:response) {double('response', code: '200')}
 
     before(:each) do
-      stub_request(:post, server_endpoint).to_return(status: 200, headers: {})
-      
+      allow(InsteddTelemetry).to receive(:api).and_return(api)
+
       InsteddTelemetry.counter_add(:calls, {project: 1})
       Timecop.travel(Period.last.end + 1.day)
     end
-    
-    let(:server_request) do
-      a_request(:post, server_endpoint).with({
-        body: process.stats.to_json,
-        headers: {"Content-Type" => "application/json"}
-      })
-    end
-    
-    let(:process)    { PeriodUpload.new(Period.last, server_url) }
+
+    let(:process)    { PeriodUpload.new(Period.last) }
 
     it "sends stats to the server" do
-      process.run
+      stats = double('stats')
+      expect(process).to receive(:stats).and_return(stats)
+      expect(api).to receive(:create_event).with(stats).and_return(response)
 
-      expect(server_request).to have_been_made.once
+      process.run
     end
 
     it "marks period as already reported" do
+      allow(api).to receive(:create_event).and_return(response)
+
       process.run
-      
+
       expect(Period.last.stats_sent_at.to_i).to eq(Time.now.to_i)
     end
 
     it "doesn't send anything for repeated runs over already sent period" do
+      expect(api).to receive(:create_event).and_return(response).once
+
       process.run
       process.run
-      
-      expect(server_request).to have_been_made.once
     end
 
     it "doesn't mark period as reported if upload request failed" do
-      stub_request(:post, server_endpoint).to_return(status: 400, headers: {})
+      failed_response = double('response', code: '400')
+      expect(api).to receive(:create_event).and_return(failed_response)
+
       process.run
 
       expect(Period.last.stats_already_sent?).to be(false)
