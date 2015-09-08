@@ -81,11 +81,11 @@ describe InsteddTelemetry do
 
   it "initializes the first period when the first stat is recorded" do
    Timecop.freeze
-   
-   InsteddTelemetry.counter_add(:calls, {project_id: 1}) 
-   
+
+   InsteddTelemetry.counter_add(:calls, {project_id: 1})
+
    counter = InsteddTelemetry::Counter.first
-   
+
    expect(counter.period).to be_present
    expect(counter.period).to eq(InsteddTelemetry::Period.current)
   end
@@ -111,6 +111,16 @@ describe InsteddTelemetry do
       end
     end
 
+  end
+
+  describe "configuration" do
+
+    it "returns application name" do
+      InsteddTelemetry.configuration.application = "an application name"
+
+      expect(InsteddTelemetry.application).to eq("an application name")
+    end
+    
   end
 
 end

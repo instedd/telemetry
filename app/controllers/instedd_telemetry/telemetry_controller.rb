@@ -5,6 +5,9 @@ module InsteddTelemetry
 
     def dismiss
       InsteddTelemetry::Setting.set(:dismissed, true)
+
+      update_installation
+
       redirect_to redirect_url
     end
 
@@ -18,16 +21,18 @@ module InsteddTelemetry
       }
 
       if params[:admin_email]
-        admin_email = params[:admin_email].strip
-        settings[:admin_email] = admin_email
-        InsteddTelemetry.api.update_installation(admin_email: admin_email)
+        settings[:admin_email] = params[:admin_email].strip
       end
 
       InsteddTelemetry::Setting.set_all(settings)
 
+      update_installation
+
       flash[:telemetry_notice] = "Thank you for helping us improve our tools!"
       redirect_to redirect_url
     end
+
+    private
 
     def check_settings_not_set
       if InsteddTelemetry::Setting.where(key: :disable_upload).any?
@@ -39,5 +44,13 @@ module InsteddTelemetry
       params[:redirect_url] || "/"
     end
 
+    def update_installation
+      params = {application: InsteddTelemetry.application}
+
+      admin_email = InsteddTelemetry::Setting.get(:admin_email)
+      params[:admin_email] = admin_email if admin_email.present?
+
+      InsteddTelemetry.api.update_installation(params)
+    end
   end
 end

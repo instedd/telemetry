@@ -4,10 +4,12 @@ module InsteddTelemetry
     DEFAULT_SERVER_URL = "http://instedd.org/telemetry"
 
     attr_accessor :server_url
+    attr_accessor :application
     attr_reader :collectors
 
     def initialize
       @server_url = DEFAULT_SERVER_URL
+      @application = Rails.application.class.parent_name.downcase
       @disabled   = false
       @collectors = []
     end

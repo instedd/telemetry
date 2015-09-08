@@ -56,6 +56,10 @@ module InsteddTelemetry
     @api ||= Api.new(configuration.server_url)
   end
 
+  def self.application
+    configuration.application
+  end
+
   def self.ensure_period_exists
     self.current_period
   end

@@ -66,6 +66,8 @@ describe InsteddTelemetry::TelemetryController do
 
 
     it "doesn't allow to access settings if user has already set them" do
+      allow(InsteddTelemetry.api).to receive(:update_installation)
+
       post :configuration_update, {}
 
       expect {
@@ -76,6 +78,10 @@ describe InsteddTelemetry::TelemetryController do
   end
 
   describe "dismissing banner" do
+
+    before :each do
+      allow(InsteddTelemetry.api).to receive(:update_installation)
+    end
 
     it "stores setting" do
       get :dismiss
@@ -92,6 +98,12 @@ describe InsteddTelemetry::TelemetryController do
       expect(response).to redirect_to("/foo")
     end
 
+    it "updates the installation" do
+      expect(InsteddTelemetry.api).to receive(:update_installation).with(application: InsteddTelemetry.application)
+
+      get :dismiss
+    end
+
   end
 
   describe "update installation" do
@@ -101,14 +113,14 @@ describe InsteddTelemetry::TelemetryController do
       allow(InsteddTelemetry).to receive(:api).and_return(api)
     end
 
-    it "updates installation when setting admin email" do
-      expect(api).to receive(:update_installation).with(admin_email: 'foo@bar.com')
+    it "updates installation with admin email if set" do
+      expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application, admin_email: 'foo@bar.com')
 
       post :configuration_update, admin_email: 'foo@bar.com'
     end
 
-    it "doesn't update installation if admin email is not present" do
-      expect(api).not_to receive(:update_installation)
+    it "updates installation without admin email if not set" do
+      expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application)
 
       post :configuration_update, telemetry_enabled: "true"
     end
