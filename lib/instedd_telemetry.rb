@@ -56,6 +56,18 @@ module InsteddTelemetry
     @api ||= Api.new(configuration.server_url)
   end
 
+  def self.ensure_period_exists
+    self.current_period
+  end
+
+  def self.current_period
+    if current_period_cached
+      @current_period
+    else
+      @current_period = InsteddTelemetry::Period.current
+    end
+  end
+
   private
 
   def self.serialize_key_attributes attributes
@@ -85,14 +97,6 @@ module InsteddTelemetry
       yield
     rescue Exception => e
       Logging.log_exception e, "An error occurred while trying to save usage stats"
-    end
-  end
-
-  def self.current_period
-    if current_period_cached
-      @current_period
-    else
-      @current_period = InsteddTelemetry::Period.current
     end
   end
 
