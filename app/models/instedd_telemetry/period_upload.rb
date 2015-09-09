@@ -27,8 +27,9 @@ module InsteddTelemetry
         collector_stats = collector.collect_stats(@period)
 
         result.tap do |r|
-          r["counters"].concat(collector_stats["counters"]) if collector_stats["counters"]
-          r["sets"].concat(collector_stats["sets"])         if collector_stats["sets"]
+          r["counters"].concat(collector_stats["counters"])   if collector_stats["counters"]
+          r["sets"].concat(collector_stats["sets"])           if collector_stats["sets"]
+          r["timespans"].concat(collector_stats["timespans"]) if collector_stats["timespans"]
         end
       end
     end
@@ -36,14 +37,15 @@ module InsteddTelemetry
     def pushed_stats_json
       counters = Counter.where(period_id: @period.id)
       set_occurrences = SetOccurrence.where(period_id: @period.id)
-
+      timespans = Timespan.where(period_id: @period.id)
       {
         "period" =>  {
           "beginning" => @period.beginning.iso8601,
           "end" => @period.end.iso8601
         },
         "counters" => counters_json(counters),
-        "sets" => sets_json(set_occurrences)
+        "sets" => sets_json(set_occurrences),
+        "timespans" => timespans_json(timespans)
       }
     end
 
@@ -63,6 +65,16 @@ module InsteddTelemetry
           "kind" => key[0],
           "key" => key[1],
           "elements" => occurrences.map(&:element)
+        }
+      end
+    end
+
+    def timespans_json(timespans)
+      timespans.map do |ts|
+        {
+          "kind" => ts.bucket,
+          "key" => ts.parse_key_attributes,
+          "days" => (ts.until - ts.since) / 1.day
         }
       end
     end

@@ -28,11 +28,12 @@ describe InsteddTelemetry::PeriodUpload do
       PeriodUpload.new(period).stats
     end
 
-    it "builds counters and sets" do
+    it "builds counters, sets and timespans" do
       InsteddTelemetry.counter_add(:calls, {project: 1}, 2)
       InsteddTelemetry.counter_add(:calls, {project: 1})
       InsteddTelemetry.set_add(:channels, {project: 1}, :smpp)
       InsteddTelemetry.set_add(:channels, {project: 1}, :other)
+      InsteddTelemetry.timespan_update(:user_lifespan, {user_id: 1}, (Date.today - 15.days), Date.today)
 
       expect(last_period_stats).to eq({
         "period" => period_date_range,
@@ -41,6 +42,9 @@ describe InsteddTelemetry::PeriodUpload do
         ],
         "sets" => [
           { "kind" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+        ],
+        "timespans" => [
+          { "kind" => "user_lifespan", "key" => { "user_id" => 1 }, "days" => 15 }
         ]
       })
     end
@@ -53,33 +57,31 @@ describe InsteddTelemetry::PeriodUpload do
       InsteddTelemetry.set_add(:users, {project: 1}, :foo)
       InsteddTelemetry.set_add(:users, {project: 1}, :bar)
 
-      expect(last_period_stats).to eq({
-        "period" => period_date_range,
-        "counters" => [
-          {
-            "kind" => "calls",
-            "key" => { "project" => 1 },
-            "value" => 1
-          },
-          {
-            "kind" => "successful_calls",
-            "key" => { "project" => 1 },
-            "value" => 3
-          }
-        ],
-        "sets" => [
-          {
-            "kind" => "channels",
-            "key" => { "project" => 1 },
-            "elements" => ["smpp"]
-          },
-          {
-            "kind" => "users",
-            "key" => { "project" => 1 },
-            "elements" => ["foo", "bar"]
-          }
-        ]
-      })
+      expect(last_period_stats["period"]).to eq(period_date_range)
+      expect(last_period_stats["counters"]).to eq([
+        {
+          "kind" => "calls",
+          "key" => { "project" => 1 },
+          "value" => 1
+        },
+        {
+          "kind" => "successful_calls",
+          "key" => { "project" => 1 },
+          "value" => 3
+        }
+      ])
+      expect(last_period_stats["sets"]).to eq([
+        {
+          "kind" => "channels",
+          "key" => { "project" => 1 },
+          "elements" => ["smpp"]
+        },
+        {
+          "kind" => "users",
+          "key" => { "project" => 1 },
+          "elements" => ["foo", "bar"]
+        }
+      ])
     end
 
     it "separates by key" do
@@ -94,60 +96,58 @@ describe InsteddTelemetry::PeriodUpload do
       InsteddTelemetry.set_add(:users, {project: 2}, :bar)
 
 
-      expect(last_period_stats).to eq({
-        "period" => period_date_range,
-        "counters" => [
-          {
-            "kind" => "calls",
-            "key" => { "project" => 1 },
-            "value" => 20
-          },
-          {
-            "kind" => "calls",
-            "key" => { "project" => 2 },
-            "value" => 50
-          },
-          {
-            "kind" => "successful_calls",
-            "key" => { "project" => 1 },
-            "value" => 10
-          },
-          {
-            "kind" => "successful_calls",
-            "key" => { "project" => 2 },
-            "value" => 25
-          }
-        ],
-        "sets" => [
-          {
-            "kind" => "channels",
-            "key" => { "project" => 1 },
-            "elements" => ["smpp"]
-          },
-          {
-            "kind" => "channels",
-            "key" => { "project" => 2 },
-            "elements" => ["other"]
-          },
-          {
-            "kind" => "users",
-            "key" => { "project" => 1 },
-            "elements" => ["foo"]
-          },
-          {
-            "kind" => "users",
-            "key" => { "project" => 2 },
-            "elements" => ["bar"]
-          }
-        ]
-      })
+      expect(last_period_stats["period"]).to eq(period_date_range)
+      expect(last_period_stats["counters"]).to eq([
+        {
+          "kind" => "calls",
+          "key" => { "project" => 1 },
+          "value" => 20
+        },
+        {
+          "kind" => "calls",
+          "key" => { "project" => 2 },
+          "value" => 50
+        },
+        {
+          "kind" => "successful_calls",
+          "key" => { "project" => 1 },
+          "value" => 10
+        },
+        {
+          "kind" => "successful_calls",
+          "key" => { "project" => 2 },
+          "value" => 25
+        }
+      ])
+      expect(last_period_stats["sets"]).to eq([
+        {
+          "kind" => "channels",
+          "key" => { "project" => 1 },
+          "elements" => ["smpp"]
+        },
+        {
+          "kind" => "channels",
+          "key" => { "project" => 2 },
+          "elements" => ["other"]
+        },
+        {
+          "kind" => "users",
+          "key" => { "project" => 1 },
+          "elements" => ["foo"]
+        },
+        {
+          "kind" => "users",
+          "key" => { "project" => 2 },
+          "elements" => ["bar"]
+        }
+      ])
     end
 
   end
 
   describe "custom pull stats" do
 
-    it "allows to add additional sets and counters before uploding" do
+    it "allows to add additional sets, counters and timespans before uploding" do
       period = Period.current
       Timecop.travel(1.week)
 
@@ -157,6 +157,9 @@ describe InsteddTelemetry::PeriodUpload do
         ],
         "sets" => [
           { "kind" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+        ],
+        "timespans" => [
+          { "kind" => "user_lifespan", "key" => { "user_id" => 1 }, "days" => 10 }
         ]
       }
 
@@ -167,6 +170,7 @@ describe InsteddTelemetry::PeriodUpload do
 
       expect(upload.stats["counters"]).to eq(pull_stats["counters"])
       expect(upload.stats["sets"]).to eq(pull_stats["sets"])
+      expect(upload.stats["timespans"]).to eq(pull_stats["timespans"])
     end
 
     it "merges pull and push stats" do
