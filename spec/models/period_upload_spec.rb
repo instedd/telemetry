@@ -37,15 +37,15 @@ describe InsteddTelemetry::PeriodUpload do
       expect(last_period_stats).to eq({
         "period" => period_date_range,
         "counters" => [
-          { "type" => "calls", "key" => { "project" => 1 }, "value" => 3 }
+          { "kind" => "calls", "key" => { "project" => 1 }, "value" => 3 }
         ],
         "sets" => [
-          { "type" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+          { "kind" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
         ]
       })
     end
 
-    it "separates by type" do
+    it "separates by kind" do
       InsteddTelemetry.counter_add(:calls, {project: 1})
       InsteddTelemetry.counter_add(:successful_calls, {project: 1}, 3)
 
@@ -57,24 +57,24 @@ describe InsteddTelemetry::PeriodUpload do
         "period" => period_date_range,
         "counters" => [
           {
-            "type" => "calls",
+            "kind" => "calls",
             "key" => { "project" => 1 },
             "value" => 1
           },
           {
-            "type" => "successful_calls",
+            "kind" => "successful_calls",
             "key" => { "project" => 1 },
             "value" => 3
           }
         ],
         "sets" => [
           {
-            "type" => "channels",
+            "kind" => "channels",
             "key" => { "project" => 1 },
             "elements" => ["smpp"]
           },
           {
-            "type" => "users",
+            "kind" => "users",
             "key" => { "project" => 1 },
             "elements" => ["foo", "bar"]
           }
@@ -98,44 +98,44 @@ describe InsteddTelemetry::PeriodUpload do
         "period" => period_date_range,
         "counters" => [
           {
-            "type" => "calls",
+            "kind" => "calls",
             "key" => { "project" => 1 },
             "value" => 20
           },
           {
-            "type" => "calls",
+            "kind" => "calls",
             "key" => { "project" => 2 },
             "value" => 50
           },
           {
-            "type" => "successful_calls",
+            "kind" => "successful_calls",
             "key" => { "project" => 1 },
             "value" => 10
           },
           {
-            "type" => "successful_calls",
+            "kind" => "successful_calls",
             "key" => { "project" => 2 },
             "value" => 25
           }
         ],
         "sets" => [
           {
-            "type" => "channels",
+            "kind" => "channels",
             "key" => { "project" => 1 },
             "elements" => ["smpp"]
           },
           {
-            "type" => "channels",
+            "kind" => "channels",
             "key" => { "project" => 2 },
             "elements" => ["other"]
           },
           {
-            "type" => "users",
+            "kind" => "users",
             "key" => { "project" => 1 },
             "elements" => ["foo"]
           },
           {
-            "type" => "users",
+            "kind" => "users",
             "key" => { "project" => 2 },
             "elements" => ["bar"]
           }
@@ -153,10 +153,10 @@ describe InsteddTelemetry::PeriodUpload do
 
       pull_stats = {
         "counters" => [
-          { "type" => "calls", "key" => { "project" => 1 }, "value" => 3 }
+          { "kind" => "calls", "key" => { "project" => 1 }, "value" => 3 }
         ],
         "sets" => [
-          { "type" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+          { "kind" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
         ]
       }
 
@@ -175,7 +175,7 @@ describe InsteddTelemetry::PeriodUpload do
 
       pull_stats = {
         "counters" => [
-          { "type" => "calls", "key" => { "project" => 2 }, "value" => 3 }
+          { "kind" => "calls", "key" => { "project" => 2 }, "value" => 3 }
         ]
       }
 
@@ -190,8 +190,8 @@ describe InsteddTelemetry::PeriodUpload do
       counters = upload.stats["counters"]
 
       expect(counters.length).to eq(2)
-      expect(counters[0]).to eq({"type"=>"calls", "key"=>{"project"=>1}, "value"=>70})
-      expect(counters[1]).to eq({"type"=>"calls", "key"=>{"project"=>2}, "value"=>3})
+      expect(counters[0]).to eq({"kind"=>"calls", "key"=>{"project"=>1}, "value"=>70})
+      expect(counters[1]).to eq({"kind"=>"calls", "key"=>{"project"=>2}, "value"=>3})
     end
 
   end
