@@ -31,6 +31,29 @@ module InsteddTelemetry
     end
   end
 
+  def self.timespan_update(bucket, key_attributes, since, untill = Time.now)
+    swallowing_errors do
+      in_transaction do
+        timespan = Timespan.find_or_initialize_by({
+          bucket: bucket,
+          key_attributes: serialize_key_attributes(key_attributes),
+          period_id: current_period.id
+        })
+        timespan.since = since if timespan.new_record?
+        timespan.until = untill
+        timespan.save
+      end
+    end
+  end
+
+  def self.timespan_since_creation_update(bucket, key_attributes, record)
+    self.timespan_update(bucket, key_attributes, record.created_at)
+  end
+
+  def self.user_lifespan_update(user)
+    self.timespan_since_creation_update(:user_lifespan, {user_id: user.id}, user)
+  end
+
   def self.setup(&block)
     case block.arity
     when 0

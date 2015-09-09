@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150828220245) do
+ActiveRecord::Schema.define(version: 20150909174500) do
 
   create_table "instedd_telemetry_counters", force: :cascade do |t|
     t.integer "period_id"
@@ -43,5 +43,13 @@ ActiveRecord::Schema.define(version: 20150828220245) do
   end
 
   add_index "instedd_telemetry_settings", ["key"], name: "index_instedd_telemetry_settings_on_key", unique: true
+
+  create_table "instedd_telemetry_timespans", force: :cascade do |t|
+    t.integer  "period_id"
+    t.string   "bucket"
+    t.text     "key_attributes"
+    t.datetime "since"
+    t.datetime "until"
+  end
 
 end

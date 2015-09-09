@@ -51,14 +51,14 @@ module InsteddTelemetry
       counters.map do |c|
         {
           "type" => c.bucket,
-          "key" => JSON.parse(c.key_attributes),
+          "key" => c.parse_key_attributes,
           "value" => c.count
         }
       end
     end
 
     def sets_json(sets)
-      sets.group_by{|occ| [occ.bucket, occ.key_attributes]}.map do |key, occurrences|
+      sets.group_by{|occ| [occ.bucket, occ.parse_key_attributes]}.map do |key, occurrences|
         {
           "type" => key[0],
           "key" => key[1],

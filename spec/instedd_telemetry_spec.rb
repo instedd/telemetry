@@ -1,4 +1,5 @@
 require 'spec_helper'
+include InsteddTelemetry
 
 describe InsteddTelemetry do
 
@@ -8,13 +9,13 @@ describe InsteddTelemetry do
       expect{
         InsteddTelemetry.set_add(:channels, {project_id: 1}, :smpp)
         InsteddTelemetry.set_add(:channels, {project_id: 2}, :smpp)
-      }.to change(InsteddTelemetry::SetOccurrence, :count).by(2)
+      }.to change(SetOccurrence, :count).by(2)
     end
 
     it "exposes parsed key attributes after retrieving from database" do
       InsteddTelemetry.set_add(:channels, {project_id: 3}, :smpp)
-      occurrence = InsteddTelemetry::SetOccurrence.first
-      expect(occurrence.key_attributes).to eq({"project_id" => 3})
+      occurrence = SetOccurrence.first
+      expect(occurrence.parse_key_attributes).to eq({"project_id" => 3})
     end
 
     it "does not create new occurrence if element was present" do
@@ -22,7 +23,7 @@ describe InsteddTelemetry do
 
       expect{
         InsteddTelemetry.set_add(:channels, {project_id: 3}, :smpp)
-      }.not_to change(InsteddTelemetry::SetOccurrence, :count)
+      }.not_to change(SetOccurrence, :count)
     end
 
     it "uses normalized attributes to identify set keys" do
@@ -32,14 +33,14 @@ describe InsteddTelemetry do
         InsteddTelemetry.set_add(:channels, {other_attribute: :ok, project_id: 3}, :smpp)
         InsteddTelemetry.set_add(:channels, {"project_id" => 3, "other_attribute" => :ok}, :smpp)
         InsteddTelemetry.set_add(:channels, {project_id: 3, other_attribute: "ok"}, :smpp)
-      }.not_to change(InsteddTelemetry::SetOccurrence, :count)
+      }.not_to change(SetOccurrence, :count)
     end
 
     it "creates new occurrences when new element is added to pre-existing key" do
       InsteddTelemetry.set_add(:channels, {project_id: 3}, :smpp)
       InsteddTelemetry.set_add(:channels, {project_id: 3}, :other)
 
-      expect(InsteddTelemetry::SetOccurrence.count).to eq(2)
+      expect(SetOccurrence.count).to eq(2)
     end
 
   end
@@ -50,20 +51,20 @@ describe InsteddTelemetry do
       expect{
         InsteddTelemetry.counter_add(:calls, {project_id: 1})
         InsteddTelemetry.counter_add(:calls, {project_id: 2})
-      }.to change(InsteddTelemetry::Counter, :count).by(2)
+      }.to change(Counter, :count).by(2)
     end
 
     it "initializes counters correctly" do
       InsteddTelemetry.counter_add(:calls, {project_id: 1})
-      expect(InsteddTelemetry::Counter.first.count).to eq(1)
+      expect(Counter.first.count).to eq(1)
     end
 
     it "increments counters according to specified amount" do
       InsteddTelemetry.counter_add(:calls, {project_id: 1})
       InsteddTelemetry.counter_add(:calls, {project_id: 2})
 
-      c1 = InsteddTelemetry::Counter.first
-      c2 = InsteddTelemetry::Counter.last
+      c1 = Counter.first
+      c2 = Counter.last
 
       InsteddTelemetry.counter_add(:calls, {project_id: 1})
 
@@ -79,15 +80,70 @@ describe InsteddTelemetry do
 
   end
 
+  describe "timespans" do
+
+    it "stores timespan on first update" do
+      expect {
+        InsteddTelemetry.timespan_update(:user_lifespan, {user_id: 1}, Date.yesterday)
+      }.to change(Timespan, :count).by(1)
+    end
+
+    it "initializes timespan correctly" do
+      Timecop.freeze(Time.utc(2015, 1, 1, 12, 0, 0))
+      InsteddTelemetry.timespan_update(:user_lifespan, {user_id: 1}, Date.yesterday)
+
+      timespan = Timespan.first
+      expect(timespan.since).to eq(Date.yesterday)
+      expect(timespan.until).to be_within(1.second).of(Time.now)
+    end
+
+    it "updates lifespan if it already exists" do
+      Timecop.freeze(Time.utc(2015, 1, 1, 12, 0, 0))
+
+      start = Date.yesterday
+      InsteddTelemetry.timespan_update(:user_lifespan, {user_id: 1}, start)
+
+      Timecop.travel(1.day)
+
+      expect {
+        InsteddTelemetry.timespan_update(:user_lifespan, {user_id: 1}, start)
+      }.not_to change(Timespan, :count)
+
+      timespan = Timespan.first
+      expect(timespan.since).to eq(start)
+      expect(timespan.until).to be_within(1.second).of(Time.now)
+    end
+
+    it "provides handy way to update span since record creation" do
+      Timecop.freeze
+      class FakeRecord
+        def created_at
+          Date.yesterday
+        end
+      end
+
+      expect {
+        InsteddTelemetry.timespan_since_creation_update(:user_lifespan, {user_id: 1}, FakeRecord.new)
+      }.to change(Timespan, :count).by(1)
+
+      timespan = Timespan.first
+      expect(timespan.bucket).to eq("user_lifespan")
+      expect(timespan.parse_key_attributes).to eq({"user_id" => 1})
+      expect(timespan.since).to eq(Date.yesterday)
+      expect(timespan.until).to be_within(1.second).of(Time.now)
+    end
+
+  end
+
   it "initializes the first period when the first stat is recorded" do
    Timecop.freeze
 
    InsteddTelemetry.counter_add(:calls, {project_id: 1})
 
-   counter = InsteddTelemetry::Counter.first
+   counter = Counter.first
 
    expect(counter.period).to be_present
-   expect(counter.period).to eq(InsteddTelemetry::Period.current)
+   expect(counter.period).to eq(Period.current)
   end
 
   describe "user settings" do
@@ -97,7 +153,7 @@ describe InsteddTelemetry do
     end
 
     it "doesn't send data if user opts out" do
-      InsteddTelemetry::Setting.set(:disable_upload, "true")
+      Setting.set(:disable_upload, "true")
       expect(InsteddTelemetry.upload_enabled).to be_falsey
     end
 
