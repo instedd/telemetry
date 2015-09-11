@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "Rakefile", "README.rdoc"]
 
   s.add_dependency "rails"
+  s.add_dependency "global_phone"
+  s.add_dependency "global_phone_dbgen"
 
   s.add_development_dependency "sqlite3"
   
