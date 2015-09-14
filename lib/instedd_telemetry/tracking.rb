@@ -23,7 +23,7 @@ module InsteddTelemetry::Tracking
     end
   end
 
-  def timespan_update(bucket, key_attributes, since, untill = Time.now)
+  def timespan_update(bucket, key_attributes, since, until = Time.now)
     safely do
       timespan = Timespan.find_or_initialize_by({
         bucket: bucket,
@@ -31,7 +31,7 @@ module InsteddTelemetry::Tracking
         period_id: InsteddTelemetry.current_period.id
       })
       timespan.since = since if timespan.new_record?
-      timespan.until = untill
+      timespan.until = until
       timespan.save
     end
   end
