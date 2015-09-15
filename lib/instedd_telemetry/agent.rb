@@ -9,6 +9,7 @@ module InsteddTelemetry
 
     def start
       Thread.new { PeriodUpload.start_background_process }
+      Thread.new { ApiServer.start }
     end
 
     def should_start?
@@ -31,4 +32,3 @@ module InsteddTelemetry
 
   end
 end
-

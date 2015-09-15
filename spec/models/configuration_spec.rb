@@ -13,6 +13,10 @@ describe InsteddTelemetry::Configuration do
     expect(configuration.application).to eq(Rails.application.class.parent_name.downcase)
   end
 
+  it "provides a default api port" do
+    expect(configuration.api_port).to eq(Configuration::DEFAULT_API_PORT)
+  end
+
   it "allows to change telemetry server configuration" do
     configuration.server_url = "http://example.com"
     expect(configuration.server_url).to eq("http://example.com")
@@ -21,6 +25,11 @@ describe InsteddTelemetry::Configuration do
   it "allows to change application name configuration" do
     configuration.application = "my cool instedd app"
     expect(configuration.application).to eq("my cool instedd app")
+  end
+
+  it "allows to change api port configuration" do
+    configuration.api_port = 1337
+    expect(configuration.api_port).to eq(1337)
   end
 
   it "allows to add custom collector by passing a block" do
