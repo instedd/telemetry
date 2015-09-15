@@ -21,4 +21,26 @@ describe InsteddTelemetry::ApiServer do
 
     server.parse_command(message.to_json)
   end
+
+  describe "socket" do
+    let(:socket) { double('socket').as_null_object }
+    let(:client) { double('client').as_null_object }
+
+    before :each do
+      allow(Socket).to receive(:new).and_return(socket)
+    end
+
+    it "receives a message" do
+      expect(server).to receive(:parse_command).with('a remote command')
+
+      expect(socket).to receive(:accept).and_return(client)
+
+      expect(client).to receive(:readline).and_return("a remote command\n", nil)
+      expect(client).to receive(:close)
+
+      expect(server).to receive(:should_stop?).and_return(false, true)
+
+      server.run
+    end
+  end
 end
