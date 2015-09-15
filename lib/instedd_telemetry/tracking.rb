@@ -70,7 +70,7 @@ module InsteddTelemetry::Tracking
         yield
       end
     rescue Exception => e
-      Logging.log_exception e, "An error occurred while trying to save usage stats"
+      InsteddTelemetry::Logging.log_exception e, "An error occurred while trying to save usage stats"
     end
   end
 
