@@ -3,6 +3,11 @@ require 'spec_helper'
 describe InsteddTelemetry::ApiServer do
   let(:server) { InsteddTelemetry::ApiServer.new }
 
+  before :each do
+    # Travis can't find SO_REUSEPORT
+    stub_const("Socket::SO_REUSEPORT", 7)
+  end
+
   it "starts a server" do
     server = double('server')
     allow(ApiServer).to receive(:new).and_return(server)
