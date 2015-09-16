@@ -2,7 +2,7 @@ module InsteddTelemetry::Tracking
 
   def set_add(bucket, key_attributes, element)
     safely do
-      SetOccurrence.find_or_create_by({
+      InsteddTelemetry::SetOccurrence.find_or_create_by({
         bucket: bucket,
         key_attributes: serialize_key_attributes(key_attributes),
         element: element,
@@ -13,7 +13,7 @@ module InsteddTelemetry::Tracking
 
   def counter_add(bucket, key_attributes, amount = 1)
     safely do
-      counter = Counter.find_or_initialize_by({
+      counter = InsteddTelemetry::Counter.find_or_initialize_by({
         bucket: bucket,
         key_attributes: serialize_key_attributes(key_attributes),
         period_id: InsteddTelemetry.current_period.id
@@ -25,7 +25,7 @@ module InsteddTelemetry::Tracking
 
   def timespan_update(bucket, key_attributes, since, untill = Time.now)
     safely do
-      timespan = Timespan.find_or_initialize_by({
+      timespan = InsteddTelemetry::Timespan.find_or_initialize_by({
         bucket: bucket,
         key_attributes: serialize_key_attributes(key_attributes),
         period_id: InsteddTelemetry.current_period.id
