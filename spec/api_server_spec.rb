@@ -10,10 +10,10 @@ describe InsteddTelemetry::ApiServer do
 
   it "starts a server" do
     server = double('server')
-    allow(ApiServer).to receive(:new).and_return(server)
+    allow(InsteddTelemetry::ApiServer).to receive(:new).and_return(server)
     expect(server).to receive(:run)
 
-    ApiServer.start
+    InsteddTelemetry::ApiServer.start
   end
 
   it "parses commands" do
@@ -44,6 +44,8 @@ describe InsteddTelemetry::ApiServer do
       expect(client).to receive(:close)
 
       expect(server).to receive(:should_stop?).and_return(false, true)
+
+      expect(Thread).to receive(:start).with(client).and_yield(client, nil)
 
       server.run
     end
