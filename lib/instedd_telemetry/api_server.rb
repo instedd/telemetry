@@ -17,14 +17,16 @@ module InsteddTelemetry
     end
 
     def handle(client)
-      while (line = client.readline)
-        begin
-          parse_command line.chomp
-        rescue Exception => e
-          InsteddTelemetry::Logging.log_exception e, "Couldn't parse remote command: #{line}"
+      ActiveRecord::Base.connection_pool.with_connection do
+        while (line = client.readline)
+          begin
+            parse_command line.chomp
+          rescue Exception => e
+            InsteddTelemetry::Logging.log_exception e, "Couldn't parse remote command: #{line}"
+          end
         end
+        client.close
       end
-      client.close
     end
 
     def parse_command(line)
