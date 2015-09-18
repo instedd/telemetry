@@ -24,7 +24,7 @@ module InsteddTelemetry
 
     def stats
       @pull_collectors.inject(pushed_stats_json) do |result, collector|
-        collector_stats = collector.collect_stats(@period)
+        collector_stats = collector.collect_stats(@period).with_indifferent_access
 
         result.tap do |r|
           r["counters"].concat(collector_stats["counters"])   if collector_stats["counters"]
