@@ -13,7 +13,7 @@ module InsteddTelemetry
     end
 
     def should_start?
-      !blacklisted_constants && !blacklisted_executables
+      !blacklisted_constants && !blacklisted_executables && !blacklisted_env
     end
 
     private
@@ -28,6 +28,10 @@ module InsteddTelemetry
 
     def is_constant_defined?(name)
       !name.constantize.nil? rescue false
+    end
+
+    def blacklisted_env
+      Rails.env.test?
     end
 
   end
