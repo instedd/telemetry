@@ -1,0 +1,11 @@
+===============================================================================
+
+Some setup you must do manually if you haven't yet:
+
+  1. Ensure you have included the telemetry warning helper somewhere in your views.
+     Insert the following in you main application layout (usually
+     app/views/layouts/application.html.erb):
+
+       <%= telemetry_warning %>
+
+===============================================================================
