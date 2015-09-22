@@ -190,3 +190,7 @@ rake global_phone:generate
 ```
 
 This will create a file under `db/global_phone.json`. You should commit this file since it will be required by any installation that uses this utility method to calculate metrics.
+
+## License
+
+Telemetry Rails is released under the [GPLv3 license](LICENSE).
