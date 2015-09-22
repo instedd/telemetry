@@ -8,13 +8,13 @@ Integrate [InSTEDD Telemetry](https://github.com/instedd/telemetry_server) into 
 
 Add the gem to your Gemfile and run the bundle command.
 
-```
+```ruby
 gem 'telemetry_rails', git: 'https://github.com/instedd/telemetry_rails.git'
 ```
 
 Execute the install generator:
 
-```
+```shell
 rails generator instedd_telemetry:install
 ```
 
@@ -23,7 +23,7 @@ This will create a default initializer in `config/initializers/instedd_telemetry
 Lastly, add the telemetry warning into your views. This will display an alert informing the user the presence of telemetry in the application. Insert the following in you main application layout (usually
  `app/views/layouts/application.html.erb`):
 
- ```
+ ```erb
  <%= telemetry_warning %>
  ```
 
@@ -31,7 +31,7 @@ Lastly, add the telemetry warning into your views. This will display an alert in
 
 The default configuration can be overridden in the telemetry initializer (`config/initializers/instedd_telemetry.rb`):
 
-```
+```ruby
 InsteddTelemetry.setup do |config|
   # Telemetry server URL
   config.server_url = "http://telemetry.instedd.org"
@@ -58,19 +58,19 @@ Metrics can be reported by using the different types of metrics. Each report is 
 
 To report a counter:
 
-```
+```ruby
 InsteddTelemetry.counter_add(kind, key_attributes, value)
 ```
 
 To add an element to a set:
 
-```
+```ruby
 InsteddTelemetry.set_add(kind, key_attributes, element)
 ```
 
 For timespans:
 
-```
+```ruby
 InsteddTelemetry.timespan_update(kind, key_attributes, since, until)
 ```
 
@@ -80,7 +80,7 @@ Additionally, metrics can be reported by creating custom _collectors_ that run b
 
 The collector should define a static method named `collect_stats` that expects the period for this metric:
 
-```
+```ruby
 module Telemetry::MyCustomCollector
   def self.collect_stats(period)
     ...
@@ -90,7 +90,7 @@ end
 
 The collector should return a hash with the following structure:
 
-```
+```ruby
 {
   counters: [
     {
@@ -121,7 +121,7 @@ The collector should return a hash with the following structure:
 
 Finally collectors should be hooked in the configuration file:
 
-```
+```ruby
 InsteddTelemetry.setup do |config|
   ...
 
@@ -131,7 +131,7 @@ end
 
 For example, to create a collector that counts active users:
 
-```
+```ruby
 # active_users_collectors.rb
 module Telemetry::ActiveUsersCollector
   def self.collect_stats(period)
@@ -167,11 +167,23 @@ This gem exposes a TCP socket that can be used to report metrics from external c
 
 Where command can be any of the name of the methods used to report metrics (`counter_add`, `set_add` and `timespan_update`). Arguments are sent as an array and follow each particular method signature.
 
-For example, to report a counter with a kind name of `calls_per_project`, a dictionary `{project_id => 17}` and a value of `23`:
+Multiple reports can be send at once by separating them by new lines:
 
 ```
+{"command": command1, "arguments": [argument1_1, argument1_2, ..., argument1_N]}\n
+{"command": command2, "arguments": [argument2_1, argument2_2, ..., argument2_N]}\n
+...
+```
+
+For example, to report a counter with a kind name of `calls_per_project`, a dictionary `{project_id => 17}` and a value of `23`:
+
+```json
 {"command": "counter_add", "arguments": ["calls_per_project", {"project_id": 17}, 23]}
 ```
+
+### Telemetry Erlang
+
+[Telemetry Erlang](https://github.com/instedd/telemetry_erlang) is a remote API client written in Erlang and packed as a library. Use this to integrate Telemetry in an Erlang project along this gem or use it as reference implementation.
 
 ## Utilities
 
@@ -179,13 +191,13 @@ For example, to report a counter with a kind name of `calls_per_project`, a dict
 
 Extracts the country code from a phone number. Returns the country code as a string if found or nil otherwise.
 
-```
+```ruby
 InsteddTelemetry::Util.country_code(number)
 ```
 
 In order to use this utility **you must** initialize a database. Run the following command:
 
-```
+```shell
 rake global_phone:generate
 ```
 
