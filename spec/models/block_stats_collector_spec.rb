@@ -7,10 +7,10 @@ describe BlockCollector do
   it "runs block to obtain stats" do
     stats = {
       "counters" => [
-        { "type" => "calls", "key" => { "project" => 1 }, "value" => 3 }
+        { "metric" => "calls", "key" => { "project" => 1 }, "value" => 3 }
       ],
       "sets" => [
-        { "type" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+        { "metric" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
       ]
     }
 

@@ -54,24 +54,24 @@ There are different types of metrics that can be used to report stats. These are
 
 ## Report metrics
 
-Metrics can be reported by using the different types of metrics. Each report is created with a _kind_ name that serves as an identifier for the metric and an optional dictionary of key attributes.
+Metrics can be reported by using the different types of metrics. Each report is created with a _metric_ name that serves as an identifier for the metric and an optional dictionary of key attributes.
 
 To report a counter:
 
 ```ruby
-InsteddTelemetry.counter_add(kind, key_attributes, value)
+InsteddTelemetry.counter_add(metric, key_attributes, value)
 ```
 
 To add an element to a set:
 
 ```ruby
-InsteddTelemetry.set_add(kind, key_attributes, element)
+InsteddTelemetry.set_add(metric, key_attributes, element)
 ```
 
 For timespans:
 
 ```ruby
-InsteddTelemetry.timespan_update(kind, key_attributes, since, until)
+InsteddTelemetry.timespan_update(metric, key_attributes, since, until)
 ```
 
 When created, these reports will be associated with a particular period of time and will be send to the telemetry server when this period is ended.
@@ -94,7 +94,7 @@ The collector should return a hash with the following structure:
 {
   counters: [
     {
-      kind: kind_of_metric,
+      metric: name_of_metric,
       key: key_dictionary,
       value: value_of_counter
     },
@@ -102,7 +102,7 @@ The collector should return a hash with the following structure:
   ],
   sets: [
     {
-      kind: kind_of_metric,
+      metric: name_of_metric,
       key: key_dictionary,
       elements: array_of_elements
     },
@@ -110,7 +110,7 @@ The collector should return a hash with the following structure:
   ],
   timespans: [
     {
-      kind: kind_of_metric,
+      metric: name_of_metric,
       key: key_dictionary,
       days: timespan_in_days
     },
@@ -139,7 +139,7 @@ module Telemetry::ActiveUsersCollector
 
     {
       counters: [
-        kind: 'active_users',
+        metric: 'active_users',
         key: {},
         value: active_users_in_period  
       ]
@@ -175,7 +175,7 @@ Multiple reports can be send at once by separating them by new lines:
 ...
 ```
 
-For example, to report a counter with a kind name of `calls_per_project`, a dictionary `{project_id => 17}` and a value of `23`:
+For example, to report a counter with a metric name of `calls_per_project`, a dictionary `{project_id => 17}` and a value of `23`:
 
 ```json
 {"command": "counter_add", "arguments": ["calls_per_project", {"project_id": 17}, 23]}

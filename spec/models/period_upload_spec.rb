@@ -38,18 +38,18 @@ describe InsteddTelemetry::PeriodUpload do
       expect(last_period_stats).to eq({
         "period" => period_date_range,
         "counters" => [
-          { "kind" => "calls", "key" => { "project" => 1 }, "value" => 3 }
+          { "metric" => "calls", "key" => { "project" => 1 }, "value" => 3 }
         ],
         "sets" => [
-          { "kind" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+          { "metric" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
         ],
         "timespans" => [
-          { "kind" => "user_lifespan", "key" => { "user_id" => 1 }, "days" => 15 }
+          { "metric" => "user_lifespan", "key" => { "user_id" => 1 }, "days" => 15 }
         ]
       })
     end
 
-    it "separates by kind" do
+    it "separates by metric" do
       InsteddTelemetry.counter_add(:calls, {project: 1})
       InsteddTelemetry.counter_add(:successful_calls, {project: 1}, 3)
 
@@ -60,24 +60,24 @@ describe InsteddTelemetry::PeriodUpload do
       expect(last_period_stats["period"]).to eq(period_date_range)
       expect(last_period_stats["counters"]).to eq([
         {
-          "kind" => "calls",
+          "metric" => "calls",
           "key" => { "project" => 1 },
           "value" => 1
         },
         {
-          "kind" => "successful_calls",
+          "metric" => "successful_calls",
           "key" => { "project" => 1 },
           "value" => 3
         }
       ])
       expect(last_period_stats["sets"]).to eq([
         {
-          "kind" => "channels",
+          "metric" => "channels",
           "key" => { "project" => 1 },
           "elements" => ["smpp"]
         },
         {
-          "kind" => "users",
+          "metric" => "users",
           "key" => { "project" => 1 },
           "elements" => ["foo", "bar"]
         }
@@ -99,44 +99,44 @@ describe InsteddTelemetry::PeriodUpload do
       expect(last_period_stats["period"]).to eq(period_date_range)
       expect(last_period_stats["counters"]).to eq([
         {
-          "kind" => "calls",
+          "metric" => "calls",
           "key" => { "project" => 1 },
           "value" => 20
         },
         {
-          "kind" => "calls",
+          "metric" => "calls",
           "key" => { "project" => 2 },
           "value" => 50
         },
         {
-          "kind" => "successful_calls",
+          "metric" => "successful_calls",
           "key" => { "project" => 1 },
           "value" => 10
         },
         {
-          "kind" => "successful_calls",
+          "metric" => "successful_calls",
           "key" => { "project" => 2 },
           "value" => 25
         }
       ])
       expect(last_period_stats["sets"]).to eq([
         {
-          "kind" => "channels",
+          "metric" => "channels",
           "key" => { "project" => 1 },
           "elements" => ["smpp"]
         },
         {
-          "kind" => "channels",
+          "metric" => "channels",
           "key" => { "project" => 2 },
           "elements" => ["other"]
         },
         {
-          "kind" => "users",
+          "metric" => "users",
           "key" => { "project" => 1 },
           "elements" => ["foo"]
         },
         {
-          "kind" => "users",
+          "metric" => "users",
           "key" => { "project" => 2 },
           "elements" => ["bar"]
         }
@@ -153,13 +153,13 @@ describe InsteddTelemetry::PeriodUpload do
 
       pull_stats = {
         "counters" => [
-          { "kind" => "calls", "key" => { "project" => 1 }, "value" => 3 }
+          { "metric" => "calls", "key" => { "project" => 1 }, "value" => 3 }
         ],
         "sets" => [
-          { "kind" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
+          { "metric" => "channels", "key" => { "project" => 1 }, "elements" => ["smpp", "other"] }
         ],
         "timespans" => [
-          { "kind" => "user_lifespan", "key" => { "user_id" => 1 }, "days" => 10 }
+          { "metric" => "user_lifespan", "key" => { "user_id" => 1 }, "days" => 10 }
         ]
       }
 
@@ -179,7 +179,7 @@ describe InsteddTelemetry::PeriodUpload do
 
       pull_stats = {
         "counters" => [
-          { "kind" => "calls", "key" => { "project" => 2 }, "value" => 3 }
+          { "metric" => "calls", "key" => { "project" => 2 }, "value" => 3 }
         ]
       }
 
@@ -194,8 +194,8 @@ describe InsteddTelemetry::PeriodUpload do
       counters = upload.stats["counters"]
 
       expect(counters.length).to eq(2)
-      expect(counters[0]).to eq({"kind"=>"calls", "key"=>{"project"=>1}, "value"=>70})
-      expect(counters[1]).to eq({"kind"=>"calls", "key"=>{"project"=>2}, "value"=>3})
+      expect(counters[0]).to eq({"metric"=>"calls", "key"=>{"project"=>1}, "value"=>70})
+      expect(counters[1]).to eq({"metric"=>"calls", "key"=>{"project"=>2}, "value"=>3})
     end
 
   end

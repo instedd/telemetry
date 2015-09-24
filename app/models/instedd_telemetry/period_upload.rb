@@ -52,7 +52,7 @@ module InsteddTelemetry
     def counters_json(counters)
       counters.map do |c|
         {
-          "kind" => c.bucket,
+          "metric" => c.bucket,
           "key" => c.parse_key_attributes,
           "value" => c.count
         }
@@ -62,7 +62,7 @@ module InsteddTelemetry
     def sets_json(sets)
       sets.group_by{|occ| [occ.bucket, occ.parse_key_attributes]}.map do |key, occurrences|
         {
-          "kind" => key[0],
+          "metric" => key[0],
           "key" => key[1],
           "elements" => occurrences.map(&:element)
         }
@@ -72,7 +72,7 @@ module InsteddTelemetry
     def timespans_json(timespans)
       timespans.map do |ts|
         {
-          "kind" => ts.bucket,
+          "metric" => ts.bucket,
           "key" => ts.parse_key_attributes,
           "days" => (ts.until - ts.since) / 1.day
         }
