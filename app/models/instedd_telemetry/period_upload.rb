@@ -43,6 +43,7 @@ module InsteddTelemetry
           "beginning" => @period.beginning.iso8601,
           "end" => @period.end.iso8601
         },
+        "application" => InsteddTelemetry.application,
         "counters" => counters_json(counters),
         "sets" => sets_json(set_occurrences),
         "timespans" => timespans_json(timespans)

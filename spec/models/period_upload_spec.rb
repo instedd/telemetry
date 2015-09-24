@@ -37,6 +37,7 @@ describe InsteddTelemetry::PeriodUpload do
 
       expect(last_period_stats).to eq({
         "period" => period_date_range,
+        "application" => InsteddTelemetry.application,
         "counters" => [
           { "metric" => "calls", "key" => { "project" => 1 }, "value" => 3 }
         ],
