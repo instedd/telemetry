@@ -9,7 +9,7 @@ Integrate [InSTEDD Telemetry](https://github.com/instedd/telemetry_server) into 
 Add the gem to your Gemfile and run the bundle command.
 
 ```ruby
-gem 'telemetry_rails', git: 'https://github.com/instedd/telemetry_rails.git'
+gem 'instedd_telemetry', git: 'https://github.com/instedd/telemetry_rails.git'
 ```
 
 Execute the install generator:
