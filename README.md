@@ -15,7 +15,7 @@ gem 'instedd_telemetry', git: 'https://github.com/instedd/telemetry_rails.git'
 Execute the install generator:
 
 ```shell
-rails generator instedd_telemetry:install
+rails generate instedd_telemetry:install
 ```
 
 This will create a default initializer in `config/initializers/instedd_telemetry.rb`, append the gem's css require into `app/assets/stylesheets/application.css`, mount the engine's routes in the `routes.rb` file and copy the required migrations (you should manually migrate the database after this).
