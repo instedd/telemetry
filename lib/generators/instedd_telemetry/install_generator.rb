@@ -14,8 +14,26 @@ module InsteddTelemetry
       end
 
       def insert_css
-        insert_into_file "app/assets/stylesheets/application.css", :after => "*= require_tree .\n" do
-          " *= require instedd_telemetry\n"
+        extensions = %w(css scss css.scss)
+        files = extensions.map{|x| "app/assets/stylesheets/application.#{x}"}
+        found = files.find{|x| File.exists? x}
+
+        if found
+          content = File.binread(found)
+
+          if content.include?("*= require_tree .")
+            insert_into_file found, :after => "*= require_tree .\n" do
+              " *= require instedd_telemetry\n"
+            end
+          elsif content.include?("*= require_self")
+            insert_into_file found, :after => "*= require_self\n" do
+              " *= require instedd_telemetry\n"
+            end
+          else
+            say_status("skipped", "insert into #{found}", :yellow)
+          end
+        else
+          say_status("skipped", "insert css require", :yellow)
         end
       end
 
