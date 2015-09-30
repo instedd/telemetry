@@ -1,8 +1,6 @@
 module InsteddTelemetry
   class Setting < BaseModel
-
-    attr_accessible :key, :value if mass_assignment?
-
+    
     @cache = HashWithIndifferentAccess.new
 
     def self.get(key)

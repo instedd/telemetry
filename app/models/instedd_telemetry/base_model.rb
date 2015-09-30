@@ -19,5 +19,8 @@ module InsteddTelemetry
       !"ActiveModel::MassAssignmentSecurity".constantize.nil? rescue false
     end
 
+    # Disable attr_accessible by protecting nothing
+    attr_protected if mass_assignment?
+
   end
 end
