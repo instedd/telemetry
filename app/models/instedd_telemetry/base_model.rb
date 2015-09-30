@@ -15,5 +15,9 @@ module InsteddTelemetry
       end
     end
 
+    def self.mass_assignment?
+      !"ActiveModel::MassAssignmentSecurity".constantize.nil? rescue false
+    end
+
   end
 end

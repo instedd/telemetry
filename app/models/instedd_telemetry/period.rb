@@ -1,5 +1,7 @@
 module InsteddTelemetry
-  class Period < ActiveRecord::Base
+  class Period < BaseModel
+
+    attr_accessible :beginning, :end if mass_assignment?
 
     def already_finished?
       self.end < Time.now
