@@ -10,7 +10,7 @@ module InsteddTelemetry
     end
 
     def self.span
-      1.week
+      InsteddTelemetry.configuration.period_size
     end
 
     def self.current

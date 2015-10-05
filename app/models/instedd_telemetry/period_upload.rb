@@ -110,7 +110,7 @@ module InsteddTelemetry
             Logging.log_exception e, "An error occurred while trying to upload usage stats"
           end
         end
-        sleep 1.hour
+        sleep InsteddTelemetry.configuration.process_run_interval
       end
     end
 
