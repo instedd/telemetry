@@ -3,7 +3,7 @@ require 'active_support/all'
 module InsteddTelemetry
   class Configuration
 
-    DEFAULT_SERVER_URL   = "http://instedd.org/telemetry"
+    DEFAULT_SERVER_URL   = "http://telemetry.instedd.org"
     DEFAULT_API_PORT     = 8089
     DEFAULT_PERIOD_SIZE  = 1.week
     DEFAULT_RUN_INTERVAL = 1.hour
