@@ -13,6 +13,8 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+ruby_1_9 = /1\.9*/ =~ RUBY_VERSION
+
 rails_version = ENV["RAILS_VERSION"] || "default"
 rails_version_spec = case rails_version
 when "default"
@@ -24,6 +26,9 @@ end
 gem 'rails', rails_version_spec
 gem 'test-unit'
 
+# see https://github.com/rails/rails/issues/21889
+gem 'rack-cache', "~> 1.2.0" if ruby_1_9
+
 group :test do
   gem 'timecop'
   gem 'webmock'
@@ -31,5 +36,5 @@ group :test do
 end
 
 group :development, :test do
-  gem 'pry-byebug' unless ENV["TRAVIS"]
+  gem 'pry-byebug' unless ENV["TRAVIS"] || ruby_1_9
 end
