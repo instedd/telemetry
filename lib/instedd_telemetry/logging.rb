@@ -5,9 +5,8 @@ module InsteddTelemetry::Logging
   end
 
   def self.log_exception e, extra_info
-    log :error, "[instedd-telemetry] #{extra_info}" if extra_info
-    log :error, e.message
-    log :error, "\t#{e.backtrace.join("\n\t")}"
+    header = extra_info ? "#{extra_info}: #{e.message}" : "#{e.message}"
+    log :error, "#{header}\n\t#{e.backtrace.join("\n\t")}"
   end
 
 end
