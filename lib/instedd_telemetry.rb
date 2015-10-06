@@ -47,6 +47,20 @@ module InsteddTelemetry
     end
   end
 
+  def self.update_installation
+    unless Setting.get(:installation_data_uploaded)
+      params = {application: InsteddTelemetry.application}
+      admin_email = InsteddTelemetry::Setting.get(:admin_email)
+      params[:admin_email] = admin_email if admin_email.present?
+
+      begin
+        InsteddTelemetry.api.update_installation(params) rescue nil
+        Setting.set(:installation_data_uploaded, true)
+      rescue
+      end
+    end
+  end
+
   private
 
   def self.current_period_cached

@@ -6,7 +6,7 @@ module InsteddTelemetry
     def dismiss
       InsteddTelemetry::Setting.set(:dismissed, true)
 
-      update_installation
+      InsteddTelemetry.update_installation
 
       redirect_to redirect_url
     end
@@ -26,7 +26,7 @@ module InsteddTelemetry
 
       InsteddTelemetry::Setting.set_all(settings)
 
-      update_installation
+      InsteddTelemetry.update_installation
 
       flash[:telemetry_notice] = "Thank you for helping us improve our tools!"
       redirect_to redirect_url
@@ -44,13 +44,5 @@ module InsteddTelemetry
       params[:redirect_url] || "/"
     end
 
-    def update_installation
-      params = {application: InsteddTelemetry.application}
-
-      admin_email = InsteddTelemetry::Setting.get(:admin_email)
-      params[:admin_email] = admin_email if admin_email.present?
-
-      InsteddTelemetry.api.update_installation(params)
-    end
   end
 end

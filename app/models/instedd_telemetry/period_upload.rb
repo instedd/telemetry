@@ -92,6 +92,7 @@ module InsteddTelemetry
             if !InsteddTelemetry.upload_enabled
               Logging.log :info, "User opted-out of telemetry report uploads, will not upload usage information."
             else
+              InsteddTelemetry.update_installation
               InsteddTelemetry.ensure_period_exists
               custom_collectors = InsteddTelemetry.configuration.collectors
 
