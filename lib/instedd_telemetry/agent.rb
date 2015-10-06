@@ -8,7 +8,7 @@ module InsteddTelemetry
     end
 
     def start
-      Thread.new { PeriodUpload.start_background_process }
+      Thread.new { ServerSynchronization.start }
       Thread.new { ApiServer.start }
     end
 
