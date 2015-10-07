@@ -1,8 +1,8 @@
 <h3>Telemetry settings</h3>
 <form action="<%= url_for controller: :telemetry, action: :configuration_update %>" method="POST">
   <div>
-    <label for="telemetry_enabled">Do you agree to send usage stats of this application to InSTEDD?</label>
-    <input value="true" type="checkbox" name="telemetry_enabled" checked>
+    <label for="opt_in">Do you agree to send usage stats of this application to InSTEDD?</label>
+    <input value="true" type="checkbox" name="opt_in" checked>
   </div>
   <div>
     <label for="admin_email">Would you like to share your email with us?</label>

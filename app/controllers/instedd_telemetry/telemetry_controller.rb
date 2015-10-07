@@ -16,7 +16,7 @@ module InsteddTelemetry
 
     def configuration_update
       settings = {
-        disable_upload: !params[:telemetry_enabled].present?,
+        disable_upload: !params[:opt_in].present?,
         dismissed: true,
         installation_installation_info_synced: false
       }

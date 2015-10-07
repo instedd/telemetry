@@ -49,12 +49,15 @@ module InsteddTelemetry
 
   def self.update_installation
     unless Setting.get(:installation_info_synced)
-      params = {application: InsteddTelemetry.application}
-      admin_email = InsteddTelemetry::Setting.get(:admin_email)
-      params[:admin_email] = admin_email if admin_email.present?
-
+      params = {
+        application: InsteddTelemetry.application,
+        admin_email: InsteddTelemetry::Setting.get(:admin_email),
+        opt_out: InsteddTelemetry::Setting.get(:disable_upload)
+      }
+      params = params.select { |k,v| !v.nil? }
+      
       begin
-        InsteddTelemetry.api.update_installation(params) rescue nil
+        InsteddTelemetry.api.update_installation(params)
         Setting.set(:installation_installation_info_synced, true)
       rescue
       end

@@ -11,20 +11,20 @@ describe InsteddTelemetry::TelemetryController do
     end
 
     it "stores settings in database" do
-      post :configuration_update, {telemetry_enabled: "true", admin_email: "foo@bar.com"}
+      post :configuration_update, {opt_in: "true", admin_email: "foo@bar.com"}
 
       expect(Setting.get_bool(:disable_upload)).to eq(false)
       expect(Setting.get(:admin_email)).to eq("foo@bar.com")
     end
 
     it "redirects to root by defeault" do
-      post :configuration_update, {telemetry_enabled: "true", admin_email: "foo@bar.com"}
+      post :configuration_update, {opt_in: "true", admin_email: "foo@bar.com"}
       expect(response).to redirect_to("/")
     end
 
     it "redirects to specified url if present" do
       post :configuration_update, {
-        telemetry_enabled: "true",
+        opt_in: "true",
         redirect_url: "/previously_visited_page"
       }
       expect(response).to redirect_to("/previously_visited_page")
@@ -47,9 +47,9 @@ describe InsteddTelemetry::TelemetryController do
     end
 
     it "doesn't allow to post settings more than once" do
-      post :configuration_update, { telemetry_enabled: "true" }
+      post :configuration_update, { opt_in: "true" }
       expect {
-        post :configuration_update, { telemetry_enabled: "false" }
+        post :configuration_update, { opt_in: "false" }
       }.to raise_error(ActionController::RoutingError)
 
       expect(Setting.get_bool(:disable_upload)).to eq(false)
@@ -113,16 +113,22 @@ describe InsteddTelemetry::TelemetryController do
       allow(InsteddTelemetry).to receive(:api).and_return(api)
     end
 
+    it "updates installation with opt-out if checkbox disabled" do
+      expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application, opt_out: "true")
+
+      post :configuration_update
+    end
+
     it "updates installation with admin email if set" do
-      expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application, admin_email: 'foo@bar.com')
+      expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application, admin_email: 'foo@bar.com', opt_out: "true")
 
       post :configuration_update, admin_email: 'foo@bar.com'
     end
 
     it "updates installation without admin email if not set" do
-      expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application)
+      expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application, opt_out: "false")
 
-      post :configuration_update, telemetry_enabled: "true"
+      post :configuration_update, opt_in: "true"
     end
   end
 

@@ -6,6 +6,8 @@ module InsteddTelemetry
         while true
           ActiveRecord::Base.connection_pool.with_connection do
             begin
+              InsteddTelemetry.update_installation
+
               if !InsteddTelemetry.upload_enabled
                 Logging.log :info, "User opted-out of telemetry report uploads, will not upload usage information."
               else
@@ -22,7 +24,6 @@ module InsteddTelemetry
       private
 
       def run_iteration
-        InsteddTelemetry.update_installation
         InsteddTelemetry.ensure_period_exists
 
         custom_collectors = InsteddTelemetry.configuration.collectors
