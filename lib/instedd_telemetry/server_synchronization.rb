@@ -31,11 +31,11 @@ module InsteddTelemetry
         InsteddTelemetry::Period.lock_for_upload do |periods|
           if periods.any?
             periods.each do |p|
-              PeriodUpload.new(p, custom_collectors).run
-              Logging.log :info, "Uploaded information for period #{p.beginning}-#{p.end}"
+              InsteddTelemetry::PeriodUpload.new(p, custom_collectors).run
+              InsteddTelemetry::Logging.log :info, "Uploaded information for period #{p.beginning}-#{p.end}"
             end
           else
-            Logging.log :info, "There is no new information to upload"
+            InsteddTelemetry::Logging.log :info, "There is no new information to upload"
           end
         end
       end
