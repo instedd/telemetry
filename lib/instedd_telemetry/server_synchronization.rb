@@ -11,7 +11,7 @@ module InsteddTelemetry
               if !InsteddTelemetry.upload_enabled
                 Logging.log :info, "User opted-out of telemetry report uploads, will not upload usage information."
               else
-                run_iteration
+                run_once
               end
             rescue Exception => e
               Logging.log_exception e, "An error occurred while trying to upload usage stats"
@@ -21,10 +21,8 @@ module InsteddTelemetry
         end
       end
 
-      private
-
-      def run_iteration
-        InsteddTelemetry.ensure_period_exists
+      def run_once
+        InsteddTelemetry.ensure_periods_exists
 
         custom_collectors = InsteddTelemetry.configuration.collectors
 

@@ -43,7 +43,7 @@ describe InsteddTelemetry::Period do
       expect(Period.count).to eq(2)
     end
 
-    it "creates new record if non-immediate last period has finished" do
+    it "creates new record for each missing period if non-immediate last period has finished" do
       d0 = Date.new(2015, 01, 01)
       d1 = d0 +  Period.span + Period.span
       
@@ -53,7 +53,7 @@ describe InsteddTelemetry::Period do
       Timecop.freeze(d1)
       p2 = Period.current
 
-      expect(Period.count).to eq(2)
+      expect(Period.count).to eq(3)
       expect(p2.beginning).to eq(d1)
       expect(p2.end).to eq(d1 + Period.span)
     end

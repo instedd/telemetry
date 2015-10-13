@@ -14,6 +14,15 @@ module InsteddTelemetry
     end
 
     def self.current
+      ensure_periods_exist
+      Period.last
+    end
+
+    #
+    # Looks up the last period record present in the database and creates a new one
+    # for every other that should exist between that date and the present time.
+    #
+    def self.ensure_periods_exist
       now = DateTime.now
       last_period = Period.last
 
@@ -25,6 +34,8 @@ module InsteddTelemetry
           current_end = current_beginning + span
 
           until now < current_end
+            create({beginning: current_beginning, end: current_end})
+            
             current_beginning = current_end
             current_end = current_beginning + span
           end

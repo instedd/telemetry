@@ -35,8 +35,8 @@ module InsteddTelemetry
     configuration.application
   end
 
-  def self.ensure_period_exists
-    self.current_period
+  def self.ensure_periods_exists
+    InsteddTelemetry::Period.ensure_periods_exist
   end
 
   def self.current_period
