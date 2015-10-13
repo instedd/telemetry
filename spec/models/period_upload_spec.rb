@@ -25,7 +25,7 @@ describe InsteddTelemetry::PeriodUpload do
 
     def last_period_stats
       Timecop.freeze(period.end + 1.day)
-      PeriodUpload.new(period).stats
+      PeriodUpload.new(period).report
     end
 
     it "builds counters, sets and timespans" do
@@ -165,13 +165,11 @@ describe InsteddTelemetry::PeriodUpload do
       }
 
       upload = PeriodUpload.new(period)
-      upload.collect_pull_stats_with [
-        StatCollectors::BlockCollector.new { |p| pull_stats }
-      ]
+      upload.add_block_collector { |p| pull_stats }
 
-      expect(upload.stats["counters"]).to eq(pull_stats["counters"])
-      expect(upload.stats["sets"]).to eq(pull_stats["sets"])
-      expect(upload.stats["timespans"]).to eq(pull_stats["timespans"])
+      expect(upload.report["counters"]).to eq(pull_stats["counters"])
+      expect(upload.report["sets"]).to eq(pull_stats["sets"])
+      expect(upload.report["timespans"]).to eq(pull_stats["timespans"])
     end
 
     it "merges pull and push stats" do
@@ -188,15 +186,32 @@ describe InsteddTelemetry::PeriodUpload do
       Timecop.travel(1.week)
 
       upload = PeriodUpload.new(period)
-      upload.collect_pull_stats_with [
-        StatCollectors::BlockCollector.new { |p| pull_stats }
-      ]
+      upload.add_block_collector { |p| pull_stats }
 
-      counters = upload.stats["counters"]
+      counters = upload.report["counters"]
 
       expect(counters.length).to eq(2)
       expect(counters[0]).to eq({"metric"=>"calls", "key"=>{"project"=>1}, "value"=>70})
       expect(counters[1]).to eq({"metric"=>"calls", "key"=>{"project"=>2}, "value"=>3})
+    end
+
+    it "captures and reports errors produced during pull stat recollection" do
+      pull_stats = { "counters" => [ { "metric" => "calls", "key" => { "project" => 2 }, "value" => 3 } ] }
+
+      period = Period.current
+      Timecop.travel(1.week)
+
+      upload = PeriodUpload.new(period)
+      upload.add_block_collector { |p| pull_stats }
+      upload.add_block_collector { |p| raise "Some unexpected error" }
+
+      report = upload.report
+      errors = report["errors"]
+
+      expect(report["counters"]).to eq([{"metric"=>"calls", "key"=>{"project"=>2}, "value"=>3}])
+
+      expect(errors.count).to eq(1)
+      expect(errors[0]).to match("Some unexpected error")
     end
 
   end
@@ -215,9 +230,9 @@ describe InsteddTelemetry::PeriodUpload do
     let(:process)    { PeriodUpload.new(Period.last) }
 
     it "sends stats to the server" do
-      stats = double('stats')
-      expect(process).to receive(:stats).and_return(stats)
-      expect(api).to receive(:create_event).with(stats).and_return(response)
+      report = double('report')
+      expect(process).to receive(:report).and_return(report)
+      expect(api).to receive(:create_event).with(report).and_return(response)
 
       process.run
     end
