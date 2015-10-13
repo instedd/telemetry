@@ -18,7 +18,7 @@ module InsteddTelemetry
       settings = {
         disable_upload: !params[:opt_in].present?,
         dismissed: true,
-        installation_installation_info_synced: false
+        installation_info_synced: false
       }
 
       if params[:admin_email]

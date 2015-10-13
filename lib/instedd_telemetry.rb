@@ -48,7 +48,7 @@ module InsteddTelemetry
   end
 
   def self.update_installation
-    unless Setting.get(:installation_info_synced)
+    unless Setting.get_bool(:installation_info_synced)
       params = {
         application: InsteddTelemetry.application,
         admin_email: InsteddTelemetry::Setting.get(:admin_email),
@@ -58,7 +58,7 @@ module InsteddTelemetry
       
       begin
         InsteddTelemetry.api.update_installation(params)
-        Setting.set(:installation_installation_info_synced, true)
+        Setting.set(:installation_info_synced, true)
       rescue
       end
     end
