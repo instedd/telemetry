@@ -11,7 +11,7 @@ module InsteddTelemetry
 
     def start
       Thread.new { ServerSynchronization.start }
-      Thread.new { ApiServer.start }
+      Thread.new { ApiServer.start } if InsteddTelemetry.configuration.remote_api_enabled
     end
 
     def should_start?

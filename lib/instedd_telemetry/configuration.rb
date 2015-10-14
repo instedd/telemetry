@@ -19,6 +19,7 @@ module InsteddTelemetry
     attr_reader   :collectors
     attr_accessor :period_size
     attr_accessor :process_run_interval
+    attr_accessor :remote_api_enabled
 
     def initialize
       @server_url = DEFAULT_SERVER_URL
@@ -28,6 +29,7 @@ module InsteddTelemetry
       @collectors = []
       @period_size = DEFAULT_PERIOD_SIZE
       @process_run_interval = DEFAULT_RUN_INTERVAL
+      @remote_api_enabled = false
     end
 
     def add_collector(collector = nil, &block)
