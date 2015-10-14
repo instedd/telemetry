@@ -3,7 +3,7 @@ module InsteddTelemetry
     isolate_namespace InsteddTelemetry
 
     initializer "instedd_telemetry.start_agent" do |app|
-      InsteddTelemetry::Agent.new.auto_start
+      InsteddTelemetry::Agent.instance.auto_start
     end
 
     initializer 'instedd_telemetry.action_controller' do |app|

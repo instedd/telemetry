@@ -1,6 +1,8 @@
 module InsteddTelemetry
   class Agent
-    def initialize
+
+    def self.instance
+      @instance ||= self.new
     end
 
     def auto_start
@@ -13,7 +15,7 @@ module InsteddTelemetry
     end
 
     def should_start?
-      !blacklisted_constants && !blacklisted_executables && !blacklisted_env
+      !blacklisted_constants && !blacklisted_executables && !blacklisted_env && !deferred_start?
     end
 
     private
@@ -34,5 +36,12 @@ module InsteddTelemetry
       Rails.env.test?
     end
 
+    def deferred_start?
+      phusion_passenger?
+    end
+
+    def phusion_passenger?
+      defined?(::PhusionPassenger)
+    end
   end
 end
