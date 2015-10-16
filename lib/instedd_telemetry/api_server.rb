@@ -7,13 +7,13 @@ module InsteddTelemetry
     end
 
     def run
-      until should_stop? do
-        until try_init_socket do
+      until try_init_socket do
           InsteddTelemetry::Logging.log :warn, "Could not start remote api server. Will retry in 1 minute."
           sleep 1.minute
-        end
+      end
 
-        InsteddTelemetry::Logging.log :info, "Remote api server successfully started on port #{InsteddTelemetry.configuration.api_port}"
+      InsteddTelemetry::Logging.log :info, "Remote api server successfully started on port #{InsteddTelemetry.configuration.api_port}"
+      until should_stop? do
         Thread.start(@socket.accept) do |client, client_sockaddr|
           handle(client)
         end
