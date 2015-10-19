@@ -15,7 +15,7 @@ module InsteddTelemetry
 
     def self.current
       ensure_periods_exist
-      Period.last
+      Period.order("beginning DESC").first
     end
 
     #
@@ -24,7 +24,7 @@ module InsteddTelemetry
     #
     def self.ensure_periods_exist
       now = DateTime.now
-      last_period = Period.last
+      last_period = Period.order("beginning DESC").first
 
       if last_period.present?
         if now < last_period.end
