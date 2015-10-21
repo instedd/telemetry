@@ -23,7 +23,7 @@ module InsteddTelemetry
     # for every other that should exist between that date and the present time.
     #
     def self.ensure_periods_exist
-      now = DateTime.now
+      now = Time.now
       last_period = Period.order("beginning DESC").first
 
       if last_period.present?
