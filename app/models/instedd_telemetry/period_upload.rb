@@ -98,7 +98,7 @@ module InsteddTelemetry
     end
 
     def timespans_json
-      timespans = Timespan.where(period_id: @period.id)
+      timespans = Timespan.all
       timespans.map do |ts|
         {
           "metric" => ts.bucket,

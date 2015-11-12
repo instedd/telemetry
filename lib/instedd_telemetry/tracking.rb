@@ -27,8 +27,7 @@ module InsteddTelemetry::Tracking
     safely do
       timespan = InsteddTelemetry::Timespan.find_or_initialize_by({
         bucket: bucket,
-        key_attributes: serialize_key_attributes(key_attributes),
-        period_id: InsteddTelemetry.current_period.id
+        key_attributes: serialize_key_attributes(key_attributes)
       })
       timespan.since = since if timespan.new_record?
       timespan.until = untill
