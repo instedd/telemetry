@@ -3,6 +3,10 @@ include InsteddTelemetry
 
 describe InsteddTelemetry::Period do
 
+  it 'sets lock time to 1 hour' do
+    expect(InsteddTelemetry::Period::LOCK_TIME).to eq(1.hour)
+  end
+
   describe "obtaining current period" do
 
     it "creates new record if there isn't any" do
@@ -85,7 +89,7 @@ describe InsteddTelemetry::Period do
         
         expect(@period_to_upload.lock_owner).not_to be_nil
         expect(@period_to_upload.lock_expiration).not_to be_nil
-        expect(@period_to_upload.lock_expiration).to eq(DateTime.now + 15.minutes)
+        expect(@period_to_upload.lock_expiration).to eq(DateTime.now + InsteddTelemetry::Period::LOCK_TIME)
       end
     end
 
@@ -110,7 +114,7 @@ describe InsteddTelemetry::Period do
         expect(periods).to include(p)
         expect(p.lock_owner).to be_present
         expect(p.lock_owner).not_to eq("other_process")
-        expect(p.lock_expiration).to eq(DateTime.now + 15.minutes)
+        expect(p.lock_expiration).to eq(DateTime.now + InsteddTelemetry::Period::LOCK_TIME)
       end
     end
 

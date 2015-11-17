@@ -1,5 +1,6 @@
 module InsteddTelemetry
   class Period < BaseModel
+    LOCK_TIME = 1.hour
 
     def already_finished?
       self.end < Time.now
@@ -50,7 +51,7 @@ module InsteddTelemetry
     def self.lock_for_upload
       now = Time.now
       lock_owner = SecureRandom.uuid
-      lock_expiration = now + 15.minutes
+      lock_expiration = now + LOCK_TIME
 
       locked_count = self.where("stats_sent_at IS NULL AND end < ?", now)
                          .where("lock_owner IS NULL OR lock_expiration < ?", now)
