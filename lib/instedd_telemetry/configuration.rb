@@ -11,7 +11,7 @@ module InsteddTelemetry
     
     DEFAULT_API_PORT     = 8089
     DEFAULT_PERIOD_SIZE  = 1.week
-    DEFAULT_RUN_INTERVAL = 1.hour
+    DEFAULT_RUN_INTERVAL = 6.hours
 
     attr_accessor :server_url
     attr_accessor :api_port
