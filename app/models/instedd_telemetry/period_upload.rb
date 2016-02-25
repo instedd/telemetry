@@ -98,14 +98,19 @@ module InsteddTelemetry
     end
 
     def timespans_json
-      timespans = Timespan.all
-      timespans.map do |ts|
-        {
-          "metric" => ts.bucket,
-          "key" => ts.parse_key_attributes,
-          "days" => (ts.until - ts.since) / 1.day
-        }
+      ret = []
+
+      Timespan.all.each do |ts|
+        unless ts.until.nil? or ts.since.nil?
+          ret.push({
+            "metric" => ts.bucket,
+            "key" => ts.parse_key_attributes,
+            "days" => (ts.until - ts.since) / 1.day
+          })
+        end
       end
+
+      ret
     end
 
     def mark_period_as_sent

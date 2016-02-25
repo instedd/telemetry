@@ -144,6 +144,30 @@ describe InsteddTelemetry::PeriodUpload do
       ])
     end
 
+    #
+    # See https://github.com/instedd/telemetry_rails/issues/98
+    #
+    # This verifies that already generated invalid timespans don't cause future
+    # uploads to fail.
+    #
+    it "doesn't fail for invalid timespans" do
+      # create period
+      InsteddTelemetry::Period.current
+
+      InsteddTelemetry.timespan_update(:user_lifespan, {user_id: 1}, (Date.today - 15.days), Date.today)
+      InsteddTelemetry.timespan_update(:user_lifespan, {user_id: 2}, nil, Date.today)
+
+      expect(last_period_stats).to eq({
+        "period" => period_date_range,
+        "application" => InsteddTelemetry.application,
+        "counters" => [],
+        "sets" => [],
+        "timespans" => [
+          { "metric" => "user_lifespan", "key" => { "user_id" => 1 }, "days" => 15 }
+        ]
+      })
+    end
+    
   end
 
   describe "custom pull stats" do
