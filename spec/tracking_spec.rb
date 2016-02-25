@@ -134,6 +134,13 @@ describe InsteddTelemetry::Tracking do
       expect(timespan.until).to be_within(1.second).of(Time.now)
     end
 
+    # See https://github.com/instedd/telemetry_rails/issues/98
+    # We had records in production with created_at = nil which caused invalid timespans to be saved
+    it "ignores timespans with invalid dates" do
+      expect {
+        timespan_update(:user_lifespan, {user_id: 1}, nil)
+      }.not_to change(Timespan, :count)
+    end
   end
 
 end

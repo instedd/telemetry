@@ -24,6 +24,11 @@ module InsteddTelemetry::Tracking
   end
 
   def timespan_update(bucket, key_attributes, since, untill = Time.now)
+    if since.nil? or untill.nil?
+      InsteddTelemetry::Logging.log :info, "Ignoring invalid timespan: #{key_attributes} with since=#{since} an until=#{untill}"
+      return
+    end
+
     safely do
       timespan = InsteddTelemetry::Timespan.find_or_initialize_by({
         bucket: bucket,
