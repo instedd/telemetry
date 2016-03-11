@@ -1,5 +1,4 @@
 module InsteddTelemetry
-  class Timespan < BaseModel
-    include StatUtils
+  class Timespan < BaseTracker
   end
 end

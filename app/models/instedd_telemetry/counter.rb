@@ -1,6 +1,5 @@
 module InsteddTelemetry
-  class Counter < BaseModel
-    include StatUtils
+  class Counter < BaseTracker
 
     belongs_to :period
 

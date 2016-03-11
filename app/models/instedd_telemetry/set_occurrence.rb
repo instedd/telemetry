@@ -1,7 +1,5 @@
 module InsteddTelemetry
-  class SetOccurrence < BaseModel
-    include StatUtils
-
+  class SetOccurrence < BaseTracker
     belongs_to :period
   end
 end
