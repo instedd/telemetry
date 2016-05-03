@@ -14,16 +14,19 @@ gem 'instedd_telemetry', git: 'https://github.com/instedd/telemetry_rails.git'
 
 Execute the install generator:
 
-```shell
+```bash
 rails generate instedd_telemetry:install
 ```
 
-This will create a default initializer in `config/initializers/instedd_telemetry.rb`, append the gem's css require into `app/assets/stylesheets/application.css`, mount the engine's routes in the `routes.rb` file and copy the required migrations (you should manually migrate the database after this).
+This will create a default initializer in `config/initializers/instedd_telemetry.rb`, append the gem's css require into `app/assets/stylesheets/application.css`, mount the engine's routes in the `routes.rb` file and copy the required migrations.
+After this, you should manually migrate the database:
+
+```rake db:migrate```
 
 Lastly, add the telemetry warning into your views. This will display an alert informing the user the presence of telemetry in the application. Insert the following in you main application layout (usually
  `app/views/layouts/application.html.erb`):
 
- ```erb
+ ```ruby
  <%= telemetry_warning %>
  ```
 
@@ -74,9 +77,9 @@ For timespans:
 InsteddTelemetry.timespan_update(metric, key_attributes, since, until)
 ```
 
-When created, these reports will be associated with a particular period of time and will be send to the telemetry server when this period is ended.
+When created, these reports will be associated with a particular period of time and will be sent to the telemetry server when this period is ended.
 
-Additionally, metrics can be reported by creating custom _collectors_ that run before any period is send to the server. Collectors define a method where you can run custom code and return a dictionary that hold the different metrics to be reported.
+Additionally, metrics can be reported by creating custom _collectors_ that run before any period is sent to the server. Collectors define a method where you can run custom code and return a dictionary that hold the different metrics to be reported.
 
 The collector should define a static method named `collect_stats` that expects the period for this metric:
 
@@ -161,15 +164,15 @@ end
 
 This gem exposes a TCP socket that can be used to report metrics from external components. The socket listens in the port specified in the configuration and expects a JSON message that follows this structure:
 
-```
+```json
 {"command": command, "arguments": [argument1, argument2, ..., argumentN]}
 ```
 
 Where command can be any of the name of the methods used to report metrics (`counter_add`, `set_add` and `timespan_update`). Arguments are sent as an array and follow each particular method signature.
 
-Multiple reports can be send at once by separating them by new lines:
+Multiple reports can be sent at once by separating them by new lines:
 
-```
+```json
 {"command": command1, "arguments": [argument1_1, argument1_2, ..., argument1_N]}\n
 {"command": command2, "arguments": [argument2_1, argument2_2, ..., argument2_N]}\n
 ...
@@ -197,7 +200,7 @@ InsteddTelemetry::Util.country_code(number)
 
 In order to use this utility **you must** initialize a database. Run the following command:
 
-```shell
+```bash
 rake global_phone:generate
 ```
 
