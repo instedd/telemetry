@@ -29,7 +29,7 @@ gem 'test-unit'
 # see https://github.com/rails/rails/issues/21889
 gem 'rack-cache', "~> 1.2.0" if ruby_1_9
 
-gem `mime-types`, "~> 2.99.1" if ruby_1_9
+gem `mime-types-data`, "~> 2.99.1" if ruby_1_9
 
 group :test do
   gem 'timecop'
