@@ -16,6 +16,7 @@ gemspec
 ruby_1_9 = /1\.9*/ =~ RUBY_VERSION
 
 rails_version = ENV["RAILS_VERSION"] || "default"
+rails_4 = /4*/ =~ rails_version
 rails_version_spec = case rails_version
 when "default"
   nil
@@ -29,7 +30,7 @@ gem 'test-unit'
 # see https://github.com/rails/rails/issues/21889
 gem 'rack-cache', "~> 1.2.0" if ruby_1_9
 
-gem `mime-types-data`, "~> 2.99.1" if ruby_1_9
+gem 'mime-types', "~> 2.99.1" if ruby_1_9 and rails_4
 
 group :test do
   gem 'timecop'
