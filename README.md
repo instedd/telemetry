@@ -21,7 +21,9 @@ rails generate instedd_telemetry:install
 This will create a default initializer in `config/initializers/instedd_telemetry.rb`, append the gem's css require into `app/assets/stylesheets/application.css`, mount the engine's routes in the `routes.rb` file and copy the required migrations.
 After this, you should manually migrate the database:
 
-```rake db:migrate```
+```bash 
+rake db:migrate
+```
 
 Lastly, add the telemetry warning into your views. This will display an alert informing the user the presence of telemetry in the application. Insert the following in you main application layout (usually
  `app/views/layouts/application.html.erb`):
@@ -164,7 +166,7 @@ end
 
 This gem exposes a TCP socket that can be used to report metrics from external components. The socket listens in the port specified in the configuration and expects a JSON message that follows this structure:
 
-```json
+```
 {"command": command, "arguments": [argument1, argument2, ..., argumentN]}
 ```
 
@@ -172,7 +174,7 @@ Where command can be any of the name of the methods used to report metrics (`cou
 
 Multiple reports can be sent at once by separating them by new lines:
 
-```json
+```
 {"command": command1, "arguments": [argument1_1, argument1_2, ..., argument1_N]}\n
 {"command": command2, "arguments": [argument2_1, argument2_2, ..., argument2_N]}\n
 ...
