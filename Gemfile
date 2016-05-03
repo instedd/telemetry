@@ -16,7 +16,7 @@ gemspec
 ruby_1_9 = /1\.9*/ =~ RUBY_VERSION
 
 rails_version = ENV["RAILS_VERSION"] || "default"
-rails_4 = /4*/ =~ rails_version
+rails_4 = /4\.2*/ =~ rails_version
 rails_version_spec = case rails_version
 when "default"
   nil
