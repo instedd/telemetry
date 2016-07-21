@@ -1,3 +1,7 @@
+# This module needs to be defined before the following requires
+module InsteddTelemetry
+end
+
 Dir[File.expand_path("../instedd_telemetry/**/*.rb", __FILE__)].each do |file|
   require file
 end
