@@ -1,8 +1,9 @@
 <% unless InsteddTelemetry::Setting.get_bool(:dismissed) || controller.kind_of?(InsteddTelemetry::TelemetryController) %>
 <div id="telemetry-warning">
-  <h3>WARNING</h3>
-  <p>TELEMETRY IS RUNNING IN THIS SERVER!!!!!</p>
+  <h3>InSTEDD Telemetry</h3>
+  <p>This server is reporting anonymous stats and errors to the InSTEDD telemetry server. Thank you for helping us improve our products' reliability.</p>
   <%= link_to 'Dismiss',  instedd_telemetry.dismiss_path(redirect_url: request.fullpath) %>
+  |
   <%= link_to 'Configure',  instedd_telemetry.configure_path %>
 </div>
 <% end %>
