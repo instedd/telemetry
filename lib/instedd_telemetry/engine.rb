@@ -10,6 +10,7 @@ module InsteddTelemetry
       ActiveSupport.on_load :action_controller do
         helper InsteddTelemetry::WarningHelper
         helper InsteddTelemetry::ApplicationHelper
+        include InsteddTelemetry::ControllerMethods
       end
     end
 
