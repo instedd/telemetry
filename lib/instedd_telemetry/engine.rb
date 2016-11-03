@@ -9,6 +9,7 @@ module InsteddTelemetry
     initializer 'instedd_telemetry.action_controller' do |app|
       ActiveSupport.on_load :action_controller do
         helper InsteddTelemetry::WarningHelper
+        helper InsteddTelemetry::ApplicationHelper
       end
     end
 

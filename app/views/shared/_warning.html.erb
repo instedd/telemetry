@@ -1,4 +1,4 @@
-<% unless InsteddTelemetry::Setting.get_bool(:dismissed) %>
+<% unless InsteddTelemetry::Setting.get_bool(:dismissed) || controller.kind_of?(InsteddTelemetry::TelemetryController) %>
 <div id="telemetry-warning">
   <h3>WARNING</h3>
   <p>TELEMETRY IS RUNNING IN THIS SERVER!!!!!</p>

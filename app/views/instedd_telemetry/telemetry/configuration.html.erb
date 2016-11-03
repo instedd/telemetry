@@ -1,14 +1,18 @@
-<h3>Telemetry settings</h3>
-<form action="<%= url_for controller: :telemetry, action: :configuration_update %>" method="POST">
-  <div>
-    <label for="opt_in">Do you agree to send usage stats of this application to InSTEDD?</label>
-    <input value="true" type="checkbox" name="opt_in" checked>
-  </div>
-  <div>
-    <label for="admin_email">Would you like to share your email with us?</label>
-    <input type="text" name="admin_email">
-  </div>
-  <div>
-    <input type="submit">
-  </div>
-</form>
+<div id="telemetry-configure">
+  <h1>InSTEDD Telemetry settings</h1>
+  <p>The InSTEDD Telemetry server collects anonymous stats and errors from across InSTEDD platform tools. We appreciate your help in agreeing to send usage stats from this server, which allow us to improve our products' reliability.</p>
+  <form action="<%= url_for controller: :telemetry, action: :configuration_update %>" method="POST">
+    <div class="">
+      <label for="opt_in">Agree to send usage stats of this application to InSTEDD</label>
+      <input value="true" type="checkbox" name="opt_in" checked>
+    </div>
+    <div class="field">
+      <label for="admin_email">Would you like to share your email with us?</label>
+      <p>We will not spam you, and will only use it to contact you for matters related to this server.</p>
+      <input type="text" name="admin_email" placeholder="Your email address" class="w30">
+    </div>
+    <div class="actions">
+      <button type="submit" class="grey">Save</button>
+    </div>
+  </form>
+</div>
