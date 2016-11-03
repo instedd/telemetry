@@ -1,3 +1,12 @@
-form div {
-  margin-bottom: 10px;
+#telemetry-configure {
+  max-width: 600px;
+  margin-left: 20px;
+}
+
+#telemetry-configure h1 {
+  margin: 30px 0;
+}
+
+#telemetry-configure form div {
+  margin: 20px 0;
 }
