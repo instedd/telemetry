@@ -21,7 +21,7 @@ rails generate instedd_telemetry:install
 This will create a default initializer in `config/initializers/instedd_telemetry.rb`, append the gem's css require into `app/assets/stylesheets/application.css`, mount the engine's routes in the `routes.rb` file and copy the required migrations.
 After this, you should manually migrate the database:
 
-```bash 
+```bash
 rake db:migrate
 ```
 
@@ -32,15 +32,6 @@ Lastly, add the telemetry warning into your views. This will display an alert in
  <%= telemetry_warning %>
  ```
  
-Optionally, if you want the configure form to be rendered within your application's layout, create a file `app/controllers/instedd_telemetry/telemetry_controller.rb` with the following contents:
-
-```ruby
-module InsteddTelemetry
-  class TelemetryController < ::ApplicationController
-  end
-end
-```
-
 ## Configuration
 
 The default configuration can be overridden in the telemetry initializer (`config/initializers/instedd_telemetry.rb`):
