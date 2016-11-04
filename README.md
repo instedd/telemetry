@@ -31,6 +31,15 @@ Lastly, add the telemetry warning into your views. This will display an alert in
  ```ruby
  <%= telemetry_warning %>
  ```
+ 
+Optionally, if you want the configure form to be rendered within your application's layout, create a file `app/controllers/instedd_telemetry/telemetry_controller.rb` with the following contents:
+
+```ruby
+module InsteddTelemetry
+  class TelemetryController < ::ApplicationController
+  end
+end
+```
 
 ## Configuration
 
