@@ -11,19 +11,19 @@ describe InsteddTelemetry::TelemetryController do
     end
 
     it "stores settings in database" do
-      post :configuration_update, {opt_in: "true", admin_email: "foo@bar.com"}
+      post :configuration_update, params: {opt_in: "true", admin_email: "foo@bar.com"}
 
       expect(Setting.get_bool(:disable_upload)).to eq(false)
       expect(Setting.get(:admin_email)).to eq("foo@bar.com")
     end
 
     it "redirects to root by defeault" do
-      post :configuration_update, {opt_in: "true", admin_email: "foo@bar.com"}
+      post :configuration_update, params: {opt_in: "true", admin_email: "foo@bar.com"}
       expect(response).to redirect_to("/")
     end
 
     it "redirects to specified url if present" do
-      post :configuration_update, {
+      post :configuration_update, params: {
         opt_in: "true",
         redirect_url: "/previously_visited_page"
       }
@@ -31,25 +31,25 @@ describe InsteddTelemetry::TelemetryController do
     end
 
     it "stores opt-out if user doesn't check input" do
-      post :configuration_update, {admin_email: "foo@bar.com"}
+      post :configuration_update, params: {admin_email: "foo@bar.com"}
       expect(Setting.get_bool(:disable_upload)).to eq(true)
     end
 
     it "allows the user not to send email" do
-      post :configuration_update, {}
+      post :configuration_update, params: {}
       expect(response).not_to be_error
       expect(Setting.get(:admin_email)).to be_nil
     end
 
     it "trims user email if present" do
-      post :configuration_update, {admin_email: " foo@bar.com\t"}
+      post :configuration_update, params: {admin_email: " foo@bar.com\t"}
       expect(Setting.get(:admin_email)).to eq("foo@bar.com")
     end
 
     it "doesn't allow to post settings more than once" do
-      post :configuration_update, { opt_in: "true" }
+      post :configuration_update, params: { opt_in: "true" }
       expect {
-        post :configuration_update, { opt_in: "false" }
+        post :configuration_update, params: { opt_in: "false" }
       }.to raise_error(ActionController::RoutingError)
 
       expect(Setting.get_bool(:disable_upload)).to eq(false)
@@ -68,7 +68,7 @@ describe InsteddTelemetry::TelemetryController do
     it "doesn't allow to access settings if user has already set them" do
       allow(InsteddTelemetry.api).to receive(:update_installation)
 
-      post :configuration_update, {}
+      post :configuration_update, params: {}
 
       expect {
         get :configuration
@@ -94,7 +94,7 @@ describe InsteddTelemetry::TelemetryController do
     end
 
     it "redirects to specified url if present" do
-      get :dismiss, { redirect_url: "/foo" }
+      get :dismiss, params: { redirect_url: "/foo" }
       expect(response).to redirect_to("/foo")
     end
 
@@ -122,13 +122,13 @@ describe InsteddTelemetry::TelemetryController do
     it "updates installation with admin email if set" do
       expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application, admin_email: 'foo@bar.com', opt_out: "true")
 
-      post :configuration_update, admin_email: 'foo@bar.com'
+      post :configuration_update, params: { admin_email: 'foo@bar.com' }
     end
 
     it "updates installation without admin email if not set" do
       expect(api).to receive(:update_installation).with(application: InsteddTelemetry.application, opt_out: "false")
 
-      post :configuration_update, opt_in: "true"
+      post :configuration_update, params: { opt_in: "true" }
     end
   end
 

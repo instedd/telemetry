@@ -1,10 +1,8 @@
 language: ruby
 rvm:
-  - 1.9.3
-  - 2.0.0
+  - 2.3.1
 env:
-  - "RAILS_VERSION=3.2"
-  - "RAILS_VERSION=4.2.3"
+  - "RAILS_VERSION=5.1.4"
 before_script:
   - bundle install
 script:

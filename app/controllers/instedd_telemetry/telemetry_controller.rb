@@ -1,7 +1,7 @@
 module InsteddTelemetry
   class TelemetryController < InsteddTelemetry::ApplicationController
 
-    before_filter :check_settings_not_set
+    before_action :check_settings_not_set
 
     def dismiss
       InsteddTelemetry::Setting.set(:dismissed, true)
